@@ -39,8 +39,10 @@ export default async function handler(req, res) {
     }
   }
 
-  // 같은 종류의 이전 업로드(재시도)는 교체
-  const stale = existing.blobs.filter((b) => b.pathname.endsWith(KINDS[kind].file));
+  // 같은 종류의 이전 업로드(재시도)는 교체 (랜덤 suffix 때문에 파일명 앞부분으로 매칭)
+  const stale = existing.blobs.filter((b) =>
+    (b.pathname.split('/').pop() || '').startsWith(kind)
+  );
   if (stale.length > 0) {
     await del(stale.map((b) => b.url));
   }

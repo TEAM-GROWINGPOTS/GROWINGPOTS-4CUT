@@ -1,7 +1,6 @@
 import { list, del } from '@vercel/blob';
 import {
   ID_RE,
-  KINDS,
   sessionPrefix,
   sessionTimes,
   viewPage,
@@ -26,13 +25,14 @@ export default async function handler(req, res) {
     return sendHTML(res, 410, gonePage());
   }
 
-  const latest = (file) =>
+  // addRandomSuffix 업로드는 'photo-xxxx.jpg' 형태가 되므로 파일명 앞부분(kind)으로 매칭
+  const latest = (kind) =>
     blobs
-      .filter((b) => b.pathname.includes(file))
+      .filter((b) => (b.pathname.split('/').pop() || '').startsWith(kind))
       .sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt))[0] ?? null;
 
-  const photo = latest(KINDS.photo.file);
-  const video = latest(KINDS.video.file);
+  const photo = latest('photo');
+  const video = latest('video');
   if (!photo && !video) return sendHTML(res, 404, notFoundPage());
 
   return sendHTML(res, 200, viewPage(expiresAt, photo, video));
