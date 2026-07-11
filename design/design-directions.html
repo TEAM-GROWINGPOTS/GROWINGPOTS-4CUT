@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GROWING CUT — 디자인 시안 A·B·C</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=IBM+Plex+Mono:wght@400;600&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Space+Mono:wght@400;700&family=Baloo+2:wght@600;800&family=Jua&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { font-family:"Pretendard Variable", Pretendard, -apple-system, sans-serif; background:#101014; color:#EDEDF0; }
+
+  /* ── 점프 내비 ─────────────────────────── */
+  nav.jump { position:fixed; top:16px; left:50%; transform:translateX(-50%); z-index:99;
+    display:flex; gap:6px; padding:6px; border-radius:999px;
+    background:rgba(16,16,20,.72); backdrop-filter:blur(14px); border:1px solid rgba(255,255,255,.14); }
+  nav.jump a { color:#EDEDF0; text-decoration:none; font-size:13px; font-weight:700;
+    padding:8px 16px; border-radius:999px; letter-spacing:.02em; }
+  nav.jump a:hover, nav.jump a:focus-visible { background:rgba(255,255,255,.14); outline:none; }
+
+  /* ── 인트로 ─────────────────────────── */
+  header.intro { max-width:880px; margin:0 auto; padding:110px 28px 72px; }
+  header.intro .eyebrow { font-family:"IBM Plex Mono",monospace; font-size:12px; letter-spacing:.32em; color:#9a9aa4; margin-bottom:18px; }
+  header.intro h1 { font-size:clamp(30px,5vw,44px); font-weight:800; line-height:1.25; letter-spacing:-.01em; }
+  header.intro p { margin-top:18px; color:#b9b9c2; font-size:15.5px; line-height:1.75; max-width:640px; }
+  header.intro .rule { margin-top:44px; display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  header.intro .rule a { display:block; text-decoration:none; border:1px solid rgba(255,255,255,.14); border-radius:14px; padding:18px 18px 16px; color:inherit; transition:border-color .2s; }
+  header.intro .rule a:hover { border-color:rgba(255,255,255,.4); }
+  header.intro .rule b { display:block; font-size:17px; margin-bottom:6px; }
+  header.intro .rule span { font-size:13px; color:#9a9aa4; line-height:1.55; }
+
+  /* ── 방향 공통 뼈대 ─────────────────────────── */
+  section.dir { padding:96px 28px 120px; }
+  .wrap { max-width:1180px; margin:0 auto; }
+  .dir .tag { font-size:12px; letter-spacing:.3em; margin-bottom:14px; }
+  .dir h2 { font-size:clamp(34px,5vw,54px); line-height:1.12; }
+  .dir .desc { margin-top:16px; font-size:15.5px; line-height:1.75; max-width:620px; }
+  .tokens { margin-top:40px; display:flex; flex-wrap:wrap; gap:28px 44px; align-items:flex-start; }
+  .chips { display:flex; gap:10px; }
+  .chip { width:64px; }
+  .chip i { display:block; height:64px; border-radius:12px; border:1px solid rgba(128,128,128,.25); }
+  .chip em { display:block; font-style:normal; font-family:"IBM Plex Mono",monospace; font-size:10px; margin-top:7px; opacity:.75; text-align:center; }
+  .typespec { font-size:13px; line-height:2; opacity:.85; }
+  .typespec b { font-weight:700; }
+  .mocks { margin-top:52px; display:flex; flex-wrap:wrap; gap:30px; align-items:flex-start; justify-content:center; }
+  .mock { width:272px; }
+  .mock .label { font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.14em; opacity:.6; margin-bottom:10px; text-align:center; }
+  .frame { position:relative; width:272px; height:372px; border-radius:22px; overflow:hidden;
+    box-shadow:0 18px 44px rgba(0,0,0,.35); border:1px solid rgba(128,128,128,.28); }
+  .frame.phone { width:210px; height:420px; border-radius:26px; margin:0 auto; }
+  .mock.phone-mock { width:210px; }
+
+  /* ════════ A. 세이프라이트 (암실) ════════ */
+  .dir-a { background:#17130F; color:#F5EFE4;
+    background-image:radial-gradient(680px 380px at 82% 4%, rgba(255,176,32,.14), transparent 70%); }
+  .dir-a .tag { color:#FFB020; font-family:"IBM Plex Mono",monospace; }
+  .dir-a h2 { font-family:"Archivo Black",sans-serif; letter-spacing:.005em; }
+  .dir-a .desc, .dir-a .typespec { color:#CBBFA8; }
+  .dir-a .edge { font-family:"IBM Plex Mono",monospace; font-size:10px; letter-spacing:.22em; color:#FFB020; }
+
+  .a-screen { position:absolute; inset:0; background:#1D1812; display:flex; flex-direction:column; }
+  .a-edgebar { display:flex; justify-content:space-between; padding:10px 12px 0; }
+  .a-main { align-items:center; justify-content:center; text-align:center;
+    background:radial-gradient(300px 200px at 50% 30%, rgba(255,176,32,.16), transparent 70%), #1D1812; }
+  .a-main .logo { font-family:"Archivo Black",sans-serif; font-size:24px; color:#F5EFE4; line-height:1.2; }
+  .a-main .logo small { display:block; font-family:"IBM Plex Mono",monospace; font-size:9px; letter-spacing:.4em; color:#FFB020; margin-bottom:8px; font-weight:400; }
+  .a-main .cta { margin-top:20px; background:#FFB020; color:#1D1812; font-weight:800; font-size:13px;
+    padding:11px 26px; border-radius:6px; box-shadow:0 0 24px rgba(255,176,32,.35); }
+  .a-main .sub { margin-top:12px; font-size:9.5px; color:#8A7A5C; }
+  .a-cam { background:linear-gradient(160deg,#242019 0%,#141110 100%); }
+  .a-cam .view { position:absolute; inset:26px 16px 74px; border:1px dashed rgba(245,239,228,.28); border-radius:8px; }
+  .a-cam .count { position:absolute; top:50%; left:50%; transform:translate(-50%,-56%);
+    font-family:"IBM Plex Mono",monospace; font-weight:600; font-size:84px; color:#FFB020;
+    text-shadow:0 0 34px rgba(255,176,32,.5); }
+  .a-cam .rec { position:absolute; top:34px; left:26px; font-family:"IBM Plex Mono",monospace; font-size:9px; color:#E5484D; letter-spacing:.2em; }
+  .a-cam .rec::before { content:""; display:inline-block; width:7px; height:7px; border-radius:50%; background:#E5484D; margin-right:5px; box-shadow:0 0 8px #E5484D; }
+  .a-cam .dots { position:absolute; bottom:52px; left:0; right:0; display:flex; gap:6px; justify-content:center; }
+  .a-cam .dots i { width:8px; height:8px; border-radius:2px; background:rgba(245,239,228,.2); }
+  .a-cam .dots i.on { background:#FFB020; }
+  .a-cam .hint { position:absolute; bottom:26px; left:0; right:0; text-align:center; font-size:9px; color:#8A7A5C; }
+  .a-result { flex-direction:row; gap:10px; padding:16px; background:#17130F; }
+  .a-strip { width:118px; background:#0E0B08; border-radius:6px; padding:9px 8px; display:flex; flex-direction:column; }
+  .a-strip .cells { display:grid; grid-template-columns:1fr 1fr; gap:5px; }
+  .a-strip .cells i { aspect-ratio:3/4; border-radius:3px; }
+  .a-strip .brand { margin-top:auto; text-align:center; font-family:"Archivo Black",sans-serif; font-size:7px; color:#F5EFE4; padding-top:7px; }
+  .a-side { flex:1; display:flex; flex-direction:column; justify-content:center; gap:9px; }
+  .a-side .qr { width:86px; height:86px; border-radius:8px; background:#F5EFE4; margin:0 auto; padding:8px; }
+  .a-side .qr i { display:block; width:100%; height:100%; background:
+    conic-gradient(#1D1812 25%, transparent 0 50%, #1D1812 0 75%, transparent 0) 0 0/14px 14px; border-radius:2px; }
+  .a-side .timer { text-align:center; font-family:"IBM Plex Mono",monospace; font-size:11px; color:#FFB020; }
+  .a-side .btn { text-align:center; font-size:10px; font-weight:700; padding:8px; border-radius:6px; }
+  .a-share { background:#17130F; }
+  .a-share .paper { margin:34px 14px 12px; background:#F5EFE4; color:#1D1812; border-radius:10px; padding:14px 12px;
+    box-shadow:0 10px 30px rgba(0,0,0,.5); }
+  .a-share .paper .cells { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+  .a-share .paper .cells i { aspect-ratio:3/4; border-radius:3px; }
+  .a-share .paper .btn { margin-top:10px; background:#1D1812; color:#FFB020; text-align:center; font-size:10.5px; font-weight:700; padding:9px; border-radius:6px; }
+  .a-share .head { text-align:center; margin-top:18px; }
+  .a-share .head b { font-family:"Archivo Black",sans-serif; font-size:13px; color:#F5EFE4; }
+  .a-share .timer { text-align:center; margin-top:6px; font-family:"IBM Plex Mono",monospace; font-size:10px; color:#FFB020; }
+
+  /* ════════ B. 스튜디오 프린트 (순백) ════════ */
+  .dir-b { background:#FFFFFF; color:#1A1A1E; }
+  .dir-b .tag { color:#8B8B94; font-family:"Space Mono",monospace; }
+  .dir-b h2 { font-family:"Bricolage Grotesque",sans-serif; font-weight:800; letter-spacing:-.02em; }
+  .dir-b .desc, .dir-b .typespec { color:#5A5A64; }
+  .dir-b .frame { border:1px solid #E4E4EA; box-shadow:0 16px 40px rgba(26,26,30,.10); }
+  .b-chips { display:flex; gap:4px; }
+  .b-chips i { width:14px; height:14px; border-radius:3px; }
+  .cp { color:#FF87AB; } .cb { color:#7FC3FF; } .cy { color:#FFD84D; } .cm { color:#59D9A5; }
+  .b-screen { position:absolute; inset:0; background:#fff; display:flex; flex-direction:column; }
+  .cropmark { position:absolute; width:14px; height:14px; border-color:#C9C9D2 !important; }
+  .cm-tl { top:8px; left:8px; border-top:1.5px solid; border-left:1.5px solid; }
+  .cm-tr { top:8px; right:8px; border-top:1.5px solid; border-right:1.5px solid; }
+  .cm-bl { bottom:8px; left:8px; border-bottom:1.5px solid; border-left:1.5px solid; }
+  .cm-br { bottom:8px; right:8px; border-bottom:1.5px solid; border-right:1.5px solid; }
+  .b-main { align-items:center; justify-content:center; text-align:center; }
+  .b-main .logo { font-family:"Bricolage Grotesque",sans-serif; font-weight:800; font-size:26px; letter-spacing:-.02em; }
+  .b-main .logo small { display:block; font-family:"Space Mono",monospace; font-size:8.5px; letter-spacing:.42em; color:#8B8B94; margin-bottom:9px; font-weight:400; }
+  .b-main .chips { justify-content:center; margin-top:14px; }
+  .b-main .chips i { width:22px; height:28px; border-radius:4px; }
+  .b-main .cta { margin-top:18px; background:#1A1A1E; color:#fff; font-weight:700; font-size:13px; padding:11px 28px; border-radius:999px; }
+  .b-main .sub { margin-top:11px; font-size:9.5px; color:#8B8B94; }
+  .b-cam { background:#F6F6F8; }
+  .b-cam .view { position:absolute; inset:24px 16px 76px; background:#E9E9EE; border-radius:6px; }
+  .b-cam .count { position:absolute; top:46%; left:50%; transform:translate(-50%,-50%);
+    font-family:"Bricolage Grotesque",sans-serif; font-weight:800; font-size:92px; color:#1A1A1E; }
+  .b-cam .stepchips { position:absolute; bottom:50px; left:0; right:0; display:flex; gap:5px; justify-content:center; }
+  .b-cam .stepchips i { width:16px; height:20px; border-radius:3px; background:#DDDDE4; }
+  .b-cam .hint { position:absolute; bottom:26px; left:0; right:0; text-align:center; font-family:"Space Mono",monospace; font-size:8.5px; color:#8B8B94; letter-spacing:.08em; }
+  .b-result { flex-direction:row; gap:12px; padding:18px 14px; }
+  .b-strip { width:116px; background:#fff; border:1px solid #E4E4EA; border-radius:4px; padding:8px; display:flex; flex-direction:column; box-shadow:0 6px 18px rgba(26,26,30,.08); }
+  .b-strip .cells { display:grid; grid-template-columns:1fr 1fr; gap:5px; }
+  .b-strip .cells i { aspect-ratio:3/4; border-radius:2px; }
+  .b-strip .brand { margin-top:auto; padding-top:7px; text-align:center; font-family:"Bricolage Grotesque",sans-serif; font-weight:800; font-size:7.5px; }
+  .b-side { flex:1; display:flex; flex-direction:column; justify-content:center; gap:9px; }
+  .b-side .qr { width:84px; height:84px; margin:0 auto; border:1.5px solid #1A1A1E; border-radius:6px; padding:7px; }
+  .b-side .qr i { display:block; width:100%; height:100%;
+    background:conic-gradient(#1A1A1E 25%, transparent 0 50%, #1A1A1E 0 75%, transparent 0) 0 0/14px 14px; }
+  .b-side .timer { text-align:center; font-family:"Space Mono",monospace; font-size:10px; color:#5A5A64; }
+  .b-side .btn { text-align:center; font-size:10px; font-weight:700; padding:8px; border-radius:999px; background:#1A1A1E; color:#fff; }
+  .b-share { background:#F6F6F8; }
+  .b-share .paper { margin:30px 14px 10px; background:#fff; border:1px solid #E4E4EA; border-radius:8px; padding:13px 11px; position:relative; }
+  .b-share .paper .cells { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+  .b-share .paper .cells i { aspect-ratio:3/4; border-radius:2px; }
+  .b-share .btnrow { display:flex; gap:6px; margin:10px 14px 0; }
+  .b-share .btnrow div { flex:1; text-align:center; font-size:9.5px; font-weight:700; padding:9px 0; border-radius:999px; }
+  .b-share .head { text-align:center; margin-top:16px; }
+  .b-share .head b { font-family:"Bricolage Grotesque",sans-serif; font-weight:800; font-size:13px; }
+  .b-share .timer { text-align:center; margin-top:5px; font-family:"Space Mono",monospace; font-size:9.5px; color:#8B8B94; }
+
+  /* ════════ C. 스티커 팝 ════════ */
+  .dir-c { background:#FFF3F0; color:#2B2430;
+    background-image:radial-gradient(#FFD9E8 1.4px, transparent 1.4px); background-size:26px 26px; }
+  .dir-c .tag { color:#FF5C8A; font-weight:800; letter-spacing:.3em; }
+  .dir-c h2 { font-family:"Jua",sans-serif; font-weight:400; }
+  .dir-c .desc, .dir-c .typespec { color:#6E6274; }
+  .dir-c .frame { border:none; box-shadow:0 18px 40px rgba(255,92,138,.22); }
+  .sticker { border:3px solid #fff; box-shadow:0 4px 12px rgba(43,36,48,.16); }
+  .c-screen { position:absolute; inset:0; background:linear-gradient(170deg,#FFF6EC, #FFE3EC); display:flex; flex-direction:column; }
+  .c-main { align-items:center; justify-content:center; text-align:center; }
+  .c-main .logo { font-family:"Jua",sans-serif; font-size:30px; color:#2B2430; }
+  .c-main .logo small { display:block; font-family:"Baloo 2",sans-serif; font-weight:800; font-size:9px; letter-spacing:.34em; color:#FF5C8A; margin-bottom:7px; }
+  .c-main .cta { margin-top:18px; background:#FF5C8A; color:#fff; font-weight:800; font-size:13.5px;
+    padding:12px 26px; border-radius:999px; transform:rotate(-2deg); }
+  .c-main .sub { margin-top:12px; font-size:9.5px; color:#A08FA6; }
+  .c-cam { background:linear-gradient(170deg,#3A2E3E,#241C28); }
+  .c-cam .view { position:absolute; inset:24px 16px 78px; border-radius:14px; background:rgba(255,255,255,.06); border:2px dashed rgba(255,255,255,.3); }
+  .c-cam .count { position:absolute; top:45%; left:50%; transform:translate(-50%,-50%) rotate(-3deg);
+    font-family:"Baloo 2",sans-serif; font-weight:800; font-size:88px; color:#fff; text-shadow:0 6px 0 rgba(255,92,138,.55); }
+  .c-cam .dots { position:absolute; bottom:54px; left:0; right:0; display:flex; gap:6px; justify-content:center; }
+  .c-cam .dots i { width:9px; height:9px; border-radius:50%; background:rgba(255,255,255,.3); }
+  .c-cam .dots i.on { background:#FF5C8A; }
+  .c-cam .hint { position:absolute; bottom:28px; left:0; right:0; text-align:center; font-size:9px; color:rgba(255,255,255,.66); }
+  .c-result { flex-direction:row; gap:11px; padding:17px 13px; }
+  .c-strip { width:118px; border-radius:10px; background:#fff; padding:9px 8px; display:flex; flex-direction:column; transform:rotate(-2deg); }
+  .c-strip .cells { display:grid; grid-template-columns:1fr 1fr; gap:5px; }
+  .c-strip .cells i { aspect-ratio:3/4; border-radius:6px; }
+  .c-strip .brand { margin-top:auto; padding-top:7px; text-align:center; font-family:"Jua",sans-serif; font-size:8px; color:#FF5C8A; }
+  .c-side { flex:1; display:flex; flex-direction:column; justify-content:center; gap:9px; }
+  .c-side .qr { width:88px; height:88px; margin:0 auto; background:#fff; border-radius:14px; padding:9px; transform:rotate(2deg); }
+  .c-side .qr i { display:block; width:100%; height:100%;
+    background:conic-gradient(#2B2430 25%, transparent 0 50%, #2B2430 0 75%, transparent 0) 0 0/14px 14px; border-radius:4px; }
+  .c-side .timer { text-align:center; font-family:"Baloo 2",sans-serif; font-weight:800; font-size:10.5px; color:#FF5C8A; }
+  .c-side .btn { text-align:center; font-size:10px; font-weight:800; padding:9px; border-radius:999px; background:#FF5C8A; color:#fff; }
+  .c-share { background:linear-gradient(170deg,#FFF6EC,#FFE3EC); }
+  .c-share .paper { margin:32px 15px 10px; background:#fff; border-radius:14px; padding:13px 11px; transform:rotate(-1.5deg); }
+  .c-share .paper .cells { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+  .c-share .paper .cells i { aspect-ratio:3/4; border-radius:6px; }
+  .c-share .btn { margin:10px 15px 0; background:#FF5C8A; color:#fff; text-align:center; font-size:10.5px; font-weight:800; padding:10px; border-radius:999px; }
+  .c-share .head { text-align:center; margin-top:16px; }
+  .c-share .head b { font-family:"Jua",sans-serif; font-size:14px; color:#2B2430; }
+  .c-share .timer { text-align:center; margin-top:5px; font-family:"Baloo 2",sans-serif; font-weight:800; font-size:10px; color:#FF5C8A; }
+
+  /* 데모 셀 색 */
+  .ph1 { background:linear-gradient(135deg,#FF9D8A,#E96A6A); }
+  .ph2 { background:linear-gradient(135deg,#FFC66B,#F09A3E); }
+  .ph3 { background:linear-gradient(135deg,#FFE98A,#E4C43F); }
+  .ph4 { background:linear-gradient(135deg,#A9DC8B,#6FB35E); }
+
+  footer { padding:70px 28px 110px; text-align:center; color:#9a9aa4; font-size:13.5px; line-height:1.9; }
+  footer b { color:#EDEDF0; }
+  @media (max-width:720px){ header.intro .rule { grid-template-columns:1fr; } }
+  @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto;} }
+</style>
+</head>
+<body>
+
+<nav class="jump" aria-label="시안 이동">
+  <a href="#a">A 세이프라이트</a><a href="#b">B 스튜디오</a><a href="#c">C 스티커 팝</a>
+</nav>
+
+<header class="intro">
+  <div class="eyebrow">GROWING CUT · DESIGN DIRECTIONS</div>
+  <h1>부스와 픽업 페이지를<br>하나의 시스템으로</h1>
+  <p>지금은 아이패드 앱(파스텔)과 QR 픽업 페이지(다크)가 서로 다른 제품처럼 보입니다.
+     아래 세 방향은 각각 메인 → 촬영 → 결과 → 손님 폰의 픽업 페이지까지 같은 언어로 묶은 시안입니다.
+     스크롤하며 무드를 비교하고 하나를 골라주세요 — 선택되면 SwiftUI와 서버 페이지에 같은 토큰으로 반영합니다.</p>
+  <div class="rule">
+    <a href="#a"><b style="color:#FFB020">A. 세이프라이트</b><span>암실의 어둠과 앰버 불빛. 부스 안 조명에 강하고, 필름 에지 마킹이 시그니처.</span></a>
+    <a href="#b"><b>B. 스튜디오 프린트</b><span>인화지의 순백과 재단선. 프레임 컬러칩 4색이 곧 브랜드가 되는 방향.</span></a>
+    <a href="#c"><b style="color:#FF5C8A">C. 스티커 팝</b><span>현행 파스텔의 완성형. 모든 요소가 흰 테두리 스티커로 붙는 문법.</span></a>
+  </div>
+</header>
+
+<!-- ═══════════ A ═══════════ -->
+<section class="dir dir-a" id="a">
+  <div class="wrap">
+    <div class="tag">DIRECTION A · SAFELIGHT</div>
+    <h2>세이프라이트</h2>
+    <p class="desc">사진이 현상되는 암실. 배경은 현상 탱크의 브라운-블랙, 빛은 세이프라이트 앰버 단 하나입니다.
+       촬영 카운트다운이 필름 카운터가 되고, 화면 모서리에는 필름 에지 마킹(<span class="edge">GC-400 ▸ 01A</span>)이 흐릅니다.
+       어두운 부스 환경에서 눈이 편하고, 픽업 페이지에서는 어둠 속에서 인화지가 '현상되어 나온' 장면을 재현합니다.</p>
+    <div class="tokens">
+      <div class="chips">
+        <div class="chip"><i style="background:#17130F"></i><em>#17130F</em></div>
+        <div class="chip"><i style="background:#1D1812"></i><em>#1D1812</em></div>
+        <div class="chip"><i style="background:#FFB020"></i><em>#FFB020</em></div>
+        <div class="chip"><i style="background:#F5EFE4"></i><em>#F5EFE4</em></div>
+        <div class="chip"><i style="background:#E5484D"></i><em>#E5484D</em></div>
+      </div>
+      <div class="typespec">
+        <b>Display</b> Archivo Black — 간판처럼 단단한 로고·헤드라인<br>
+        <b>Data</b> IBM Plex Mono — 카운터·타이머·에지 마킹<br>
+        <b>Body</b> Pretendard — 한글 본문 · 안내 문구
+      </div>
+    </div>
+
+    <div class="mocks">
+      <div class="mock">
+        <div class="label">01 · 메인</div>
+        <div class="frame"><div class="a-screen a-main">
+          <div class="a-edgebar" style="position:absolute;top:0;left:0;right:0"><span class="edge">GC-400</span><span class="edge">▸ 00A</span></div>
+          <div class="logo"><small>SELF STUDIO</small>GROWING<br>CUT</div>
+          <div class="cta">촬영 시작</div>
+          <div class="sub">5초 타이머 · 8컷 · QR 픽업 4시간</div>
+        </div></div>
+      </div>
+      <div class="mock">
+        <div class="label">02 · 촬영</div>
+        <div class="frame"><div class="a-screen a-cam">
+          <div class="view"></div>
+          <div class="rec">REC</div>
+          <span class="edge" style="position:absolute;top:34px;right:26px">▸ 03A</span>
+          <div class="count">4</div>
+          <div class="dots"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="hint">타이머가 끝나면 자동으로 찍혀요</div>
+        </div></div>
+      </div>
+      <div class="mock">
+        <div class="label">03 · 결과 + QR</div>
+        <div class="frame"><div class="a-screen a-result">
+          <div class="a-strip">
+            <span class="edge" style="margin-bottom:6px">GC-400 ▸ 4EXP</span>
+            <div class="cells"><i class="ph1"></i><i class="ph2"></i><i class="ph3"></i><i class="ph4"></i></div>
+            <div class="brand">GROWING CUT</div>
+          </div>
+          <div class="a-side">
+            <div class="qr"><i></i></div>
+            <div class="timer">03:59:52 남음</div>
+            <div class="btn" style="background:#FFB020;color:#1D1812">처음으로</div>
+            <div class="btn" style="border:1px solid rgba(245,239,228,.3);color:#F5EFE4">이 기기에 저장</div>
+          </div>
+        </div></div>
+      </div>
+      <div class="mock phone-mock">
+        <div class="label">04 · 픽업 페이지 (손님 폰)</div>
+        <div class="frame phone"><div class="a-screen a-share">
+          <div class="head"><span class="edge">DARKROOM PICKUP</span><br><b>네컷이 현상됐어요</b></div>
+          <div class="timer">링크 만료까지 03:59:52</div>
+          <div class="paper">
+            <div class="cells"><i class="ph1"></i><i class="ph2"></i><i class="ph3"></i><i class="ph4"></i></div>
+            <div class="btn">사진 저장</div>
+          </div>
+          <div style="text-align:center"><span class="edge" style="opacity:.6">MOTION PRINT ▾</span></div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ B ═══════════ -->
+<section class="dir dir-b" id="b">
+  <div class="wrap">
+    <div class="tag">DIRECTION B · STUDIO PRINT</div>
+    <h2>스튜디오 프린트</h2>
+    <p class="desc">인화지의 순백 위에 잉크 한 색, 그리고 <b>프레임 컬러칩 4색</b>이 유일한 컬러입니다.
+       네컷 부스의 '프레임 고르기' 문화를 그대로 브랜드 팔레트로 승격시킨 방향 —
+       칩은 촬영 진행 표시, 프레임 선택, 다운로드 버튼까지 화면마다 같은 역할 언어로 반복됩니다.
+       모서리의 재단선(crop mark)이 '인쇄물' 감각을 만듭니다.</p>
+    <div class="tokens">
+      <div class="chips">
+        <div class="chip"><i style="background:#FFFFFF"></i><em>#FFFFFF</em></div>
+        <div class="chip"><i style="background:#1A1A1E"></i><em>#1A1A1E</em></div>
+        <div class="chip"><i style="background:#FF87AB"></i><em>#FF87AB</em></div>
+        <div class="chip"><i style="background:#7FC3FF"></i><em>#7FC3FF</em></div>
+        <div class="chip"><i style="background:#FFD84D"></i><em>#FFD84D</em></div>
+        <div class="chip"><i style="background:#59D9A5"></i><em>#59D9A5</em></div>
+      </div>
+      <div class="typespec">
+        <b>Display</b> Bricolage Grotesque — 유연하고 개성 있는 그로테스크<br>
+        <b>Data</b> Space Mono — 재단 마킹 · 타이머<br>
+        <b>Body</b> Pretendard — 한글 본문
+      </div>
+    </div>
+
+    <div class="mocks">
+      <div class="mock">
+        <div class="label">01 · 메인</div>
+        <div class="frame"><div class="b-screen b-main">
+          <i class="cropmark cm-tl"></i><i class="cropmark cm-tr"></i><i class="cropmark cm-bl"></i><i class="cropmark cm-br"></i>
+          <div class="logo"><small>PHOTO STUDIO</small>Growing Cut</div>
+          <div class="chips b-chips"><i style="background:#FF87AB"></i><i style="background:#7FC3FF"></i><i style="background:#FFD84D"></i><i style="background:#59D9A5"></i></div>
+          <div class="cta">촬영 시작</div>
+          <div class="sub">5초 타이머 · 8컷 · QR 픽업 4시간</div>
+        </div></div>
+      </div>
+      <div class="mock">
+        <div class="label">02 · 촬영</div>
+        <div class="frame"><div class="b-screen b-cam">
+          <i class="cropmark cm-tl"></i><i class="cropmark cm-tr"></i><i class="cropmark cm-bl"></i><i class="cropmark cm-br"></i>
+          <div class="view"></div>
+          <div class="count">4</div>
+          <div class="stepchips"><i style="background:#FF87AB"></i><i style="background:#7FC3FF"></i><i style="background:#FFD84D"></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="hint">CUT 04 / 08 — AUTO</div>
+        </div></div>
+      </div>
+      <div class="mock">
+        <div class="label">03 · 결과 + QR</div>
+        <div class="frame"><div class="b-screen b-result">
+          <div class="b-strip">
+            <div class="cells"><i class="ph1"></i><i class="ph2"></i><i class="ph3"></i><i class="ph4"></i></div>
+            <div class="brand">Growing Cut<br><span style="font-family:'Space Mono',monospace;font-weight:400;font-size:6px;color:#8B8B94">2026.07.12 03:14</span></div>
+          </div>
+          <div class="b-side">
+            <div class="qr"><i></i></div>
+            <div class="timer">03:59:52 LEFT</div>
+            <div class="btn">처음으로</div>
+            <div class="btn" style="background:#fff;color:#1A1A1E;border:1.5px solid #1A1A1E">이 기기에 저장</div>
+          </div>
+        </div></div>
+      </div>
+      <div class="mock phone-mock">
+        <div class="label">04 · 픽업 페이지 (손님 폰)</div>
+        <div class="frame phone"><div class="b-screen b-share">
+          <div class="head"><span style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.3em;color:#8B8B94">PICKUP</span><br><b>네컷이 도착했어요</b></div>
+          <div class="timer">03:59:52 LEFT</div>
+          <div class="paper">
+            <i class="cropmark cm-tl"></i><i class="cropmark cm-tr"></i><i class="cropmark cm-bl"></i><i class="cropmark cm-br"></i>
+            <div class="cells"><i class="ph1"></i><i class="ph2"></i><i class="ph3"></i><i class="ph4"></i></div>
+          </div>
+          <div class="btnrow">
+            <div style="background:#FF87AB;color:#fff">사진 저장</div>
+            <div style="background:#7FC3FF;color:#fff">영상 저장</div>
+          </div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ C ═══════════ -->
+<section class="dir dir-c" id="c">
+  <div class="wrap">
+    <div class="tag">DIRECTION C · STICKER POP</div>
+    <h2>스티커 팝</h2>
+    <p class="desc">지금 쓰는 파스텔의 완성형입니다. 버튼·배지·QR 카드·네컷까지 모든 요소가
+       흰 테두리 '스티커'로 살짝 기울여 붙고, 배경에는 도트 패턴이 깔립니다.
+       한글 디스플레이(Jua)가 간판 글씨처럼 말을 걸고, 촬영 화면만 어둡게 반전해 카메라에 집중시킵니다.</p>
+    <div class="tokens">
+      <div class="chips">
+        <div class="chip"><i style="background:#FFF3F0"></i><em>#FFF3F0</em></div>
+        <div class="chip"><i style="background:#FF5C8A"></i><em>#FF5C8A</em></div>
+        <div class="chip"><i style="background:#2B2430"></i><em>#2B2430</em></div>
+        <div class="chip"><i style="background:#B79CFF"></i><em>#B79CFF</em></div>
+        <div class="chip"><i style="background:#FFD84D"></i><em>#FFD84D</em></div>
+      </div>
+      <div class="typespec">
+        <b>Display</b> Jua — 부스 간판 같은 한글 라운드체<br>
+        <b>Accent</b> Baloo 2 — 숫자·타이머·뱃지<br>
+        <b>Body</b> Pretendard — 한글 본문
+      </div>
+    </div>
+
+    <div class="mocks">
+      <div class="mock">
+        <div class="label">01 · 메인</div>
+        <div class="frame"><div class="c-screen c-main">
+          <div class="logo"><small>GROWING CUT</small>네컷사진</div>
+          <div class="cta sticker">촬영 시작 📸</div>
+          <div class="sub">5초 타이머 · 8컷 · QR 픽업 4시간</div>
+        </div></div>
+      </div>
+      <div class="mock">
+        <div class="label">02 · 촬영 (다크 반전)</div>
+        <div class="frame"><div class="c-screen c-cam">
+          <div class="view"></div>
+          <div class="count">4</div>
+          <div class="dots"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="hint">타이머가 끝나면 자동으로 찰칵! ✨</div>
+        </div></div>
+      </div>
+      <div class="mock">
+        <div class="label">03 · 결과 + QR</div>
+        <div class="frame"><div class="c-screen c-result">
+          <div class="c-strip sticker">
+            <div class="cells"><i class="ph1"></i><i class="ph2"></i><i class="ph3"></i><i class="ph4"></i></div>
+            <div class="brand">GROWING CUT</div>
+          </div>
+          <div class="c-side">
+            <div class="qr sticker"><i></i></div>
+            <div class="timer">3:59:52 남음 ⏰</div>
+            <div class="btn sticker">처음으로 🏠</div>
+          </div>
+        </div></div>
+      </div>
+      <div class="mock phone-mock">
+        <div class="label">04 · 픽업 페이지 (손님 폰)</div>
+        <div class="frame phone"><div class="c-screen c-share">
+          <div class="head"><b>네컷이 도착했어요 🎞️</b></div>
+          <div class="timer">링크 만료까지 3:59:52</div>
+          <div class="paper sticker">
+            <div class="cells"><i class="ph1"></i><i class="ph2"></i><i class="ph3"></i><i class="ph4"></i></div>
+          </div>
+          <div class="btn sticker">사진 저장 💾</div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  마음에 드는 방향을 골라주세요 — <b>A 세이프라이트 · B 스튜디오 프린트 · C 스티커 팝</b><br>
+  선택되면 같은 토큰(색·타이포·모양 규칙)으로 SwiftUI 앱과 공유 페이지 양쪽에 반영합니다.
+  두 방향을 섞는 것(예: B의 컬러칩 + C의 스티커 버튼)도 가능해요.
+</footer>
+
+</body>
+</html>
