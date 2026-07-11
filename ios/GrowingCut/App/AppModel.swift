@@ -33,6 +33,8 @@ final class AppModel: ObservableObject {
     @Published var demoError: String?
 
     @AppStorage("serverBaseURL") var serverBaseURL: String = "http://localhost:8787"
+    /// 공개 서버(GC_UPLOAD_KEY 설정 시)용 업로드 키 — 비어 있으면 헤더를 보내지 않는다
+    @AppStorage("uploadKey") var uploadKey: String = ""
 
     private(set) var sessionDir: URL = FileManager.default.temporaryDirectory
         .appendingPathComponent("growingcut-session", isDirectory: true)

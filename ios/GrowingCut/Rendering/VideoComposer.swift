@@ -72,6 +72,10 @@ enum VideoComposer {
             AVVideoCodecKey: AVVideoCodecType.h264,
             AVVideoWidthKey: Int(renderSize.width),
             AVVideoHeightKey: Int(renderSize.height),
+            // 업로드 크기 상한(서버리스 요청 제한 4.5MB) 확보: 5초 기준 약 2.2MB
+            AVVideoCompressionPropertiesKey: [
+                AVVideoAverageBitRateKey: 3_500_000,
+            ],
         ])
         input.expectsMediaDataInRealTime = false
         let adaptor = AVAssetWriterInputPixelBufferAdaptor(

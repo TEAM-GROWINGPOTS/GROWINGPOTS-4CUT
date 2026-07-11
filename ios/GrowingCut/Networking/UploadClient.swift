@@ -15,12 +15,14 @@ enum UploadError: LocalizedError {
 /// 그로잉컷 공유 서버 클라이언트
 struct UploadClient {
     let base: URL
+    let uploadKey: String
 
-    init(baseURL: String) throws {
+    init(baseURL: String, uploadKey: String = "") throws {
         guard let url = URL(string: baseURL), url.scheme != nil else {
             throw UploadError.badBaseURL
         }
         base = url
+        self.uploadKey = uploadKey
     }
 
     private struct PutResponse: Decodable {
@@ -62,6 +64,9 @@ struct UploadClient {
         var request = URLRequest(url: url)
         request.httpMethod = "PUT"
         request.setValue(contentType, forHTTPHeaderField: "Content-Type")
+        if !uploadKey.isEmpty {
+            request.setValue(uploadKey, forHTTPHeaderField: "X-GC-Key")
+        }
         request.timeoutInterval = 180
 
         let (data, response) = try await send(request)

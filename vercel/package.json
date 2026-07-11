@@ -1,0 +1,10 @@
+{
+  "name": "growingcut-share",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "GROWING CUT 4시간 임시 공유 링크 서버 (Vercel + Blob)",
+  "dependencies": {
+    "@vercel/blob": "^1.0.0"
+  }
+}

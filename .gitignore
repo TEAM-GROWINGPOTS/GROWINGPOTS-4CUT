@@ -9,3 +9,7 @@ xcuserdata/
 
 # 서버 업로드 데이터 (4시간 임시 파일)
 server/data/
+
+# Node
+node_modules/
+.vercel/

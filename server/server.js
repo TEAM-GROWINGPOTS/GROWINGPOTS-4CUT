@@ -287,6 +287,10 @@ const server = http.createServer(async (req, res) => {
 
     // PUT /api/s/:id/(photo|video)
     if (req.method === 'PUT' && parts[0] === 'api' && parts[1] === 's' && parts.length === 4) {
+      const requiredKey = process.env.GC_UPLOAD_KEY;
+      if (requiredKey && req.headers['x-gc-key'] !== requiredKey) {
+        return sendJSON(res, 401, { ok: false, error: 'bad upload key' });
+      }
       const [, , id, kind] = parts;
       if (!ID_RE.test(id) || !FILES[kind]) {
         return sendJSON(res, 400, { ok: false, error: 'bad id or kind' });

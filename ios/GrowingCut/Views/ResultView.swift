@@ -40,18 +40,18 @@ final class ResultEngine: ObservableObject {
 
     private var started = false
 
-    func runIfNeeded(picked: [Shot], style: FrameStyle, baseURL: String, workDir: URL) async {
+    func runIfNeeded(picked: [Shot], style: FrameStyle, baseURL: String, uploadKey: String, workDir: URL) async {
         guard !started else { return }
         started = true
-        await run(picked: picked, style: style, baseURL: baseURL, workDir: workDir)
+        await run(picked: picked, style: style, baseURL: baseURL, uploadKey: uploadKey, workDir: workDir)
     }
 
-    func retry(picked: [Shot], style: FrameStyle, baseURL: String, workDir: URL) async {
-        await run(picked: picked, style: style, baseURL: baseURL, workDir: workDir)
+    func retry(picked: [Shot], style: FrameStyle, baseURL: String, uploadKey: String, workDir: URL) async {
+        await run(picked: picked, style: style, baseURL: baseURL, uploadKey: uploadKey, workDir: workDir)
     }
 
     /// 각 단계 산출물이 이미 있으면 건너뛰므로, 실패 후 재시도 시 실패 지점부터 이어간다.
-    private func run(picked: [Shot], style: FrameStyle, baseURL: String, workDir: URL) async {
+    private func run(picked: [Shot], style: FrameStyle, baseURL: String, uploadKey: String, workDir: URL) async {
         do {
             shareURLString = "\(baseURL)/s/\(sessionID)"
             let dateText = Self.dateFormatter.string(from: Date())
@@ -101,7 +101,7 @@ final class ResultEngine: ObservableObject {
             // 3) 업로드
             phase = .uploading
             print("[GC] 업로드 시작 → \(baseURL)")
-            let client = try UploadClient(baseURL: baseURL)
+            let client = try UploadClient(baseURL: baseURL, uploadKey: uploadKey)
             var expiry: Date?
             if let photoData {
                 expiry = try await client.putPhoto(photoData, id: sessionID)
@@ -192,6 +192,7 @@ struct ResultView: View {
                 picked: model.picked,
                 style: model.style,
                 baseURL: model.normalizedBaseURL,
+                uploadKey: model.uploadKey,
                 workDir: model.sessionDir
             )
         }
@@ -340,6 +341,7 @@ struct ResultView: View {
                             picked: model.picked,
                             style: model.style,
                             baseURL: model.normalizedBaseURL,
+                            uploadKey: model.uploadKey,
                             workDir: model.sessionDir
                         )
                     }

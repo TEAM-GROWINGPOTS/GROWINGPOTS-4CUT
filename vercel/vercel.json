@@ -1,0 +1,11 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    { "source": "/", "destination": "/api/page" },
+    { "source": "/s/:id", "destination": "/api/page?id=:id" },
+    { "source": "/api/s/:id/:kind", "destination": "/api/upload?id=:id&kind=:kind" }
+  ],
+  "crons": [
+    { "path": "/api/sweep", "schedule": "0 18 * * *" }
+  ]
+}
