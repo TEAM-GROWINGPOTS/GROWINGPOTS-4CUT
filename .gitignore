@@ -1,0 +1,11 @@
+# macOS
+.DS_Store
+
+# Xcode
+ios/build/
+ios/DerivedData/
+*.xcuserdatad/
+xcuserdata/
+
+# 서버 업로드 데이터 (4시간 임시 파일)
+server/data/

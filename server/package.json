@@ -1,0 +1,10 @@
+{
+  "name": "growingcut-server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "description": "GROWING CUT 4시간 임시 공유 링크 서버 (무의존)",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
