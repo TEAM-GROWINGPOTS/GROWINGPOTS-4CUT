@@ -38,14 +38,14 @@ final class AppModel: ObservableObject {
     /// 공개 서버(GC_UPLOAD_KEY 설정 시)용 업로드 키 — 비어 있으면 헤더를 보내지 않는다
     @AppStorage("uploadKey") var uploadKey: String = ""
     // 생성 대기 화면 프로모 QR 링크 (설정에서 변경 가능)
-    @AppStorage("instagramURL") var instagramURL: String = "https://instagram.com/growinpots.official"
+    @AppStorage("instagramURL") var instagramURL: String = "https://instagram.com/growingpots.official"
     @AppStorage("landingURL") var landingURL: String = "https://growingpots.kr/landing"
 
     init() {
         // 구 기본값이 기기에 저장돼 있으면 새 도메인 기반 값으로 1회 이전
         let migrations: [(key: String, old: [String], new: String)] = [
             ("serverBaseURL", ["https://growingcut.vercel.app"], "https://4-cut.growingpots.kr"),
-            ("instagramURL", ["https://instagram.com/growingpots", "https://instagram.com/growinpots.offical"], "https://instagram.com/growinpots.official"),
+            ("instagramURL", ["https://instagram.com/growingpots", "https://instagram.com/growinpots.offical", "https://instagram.com/growinpots.official"], "https://instagram.com/growingpots.official"),
             ("landingURL", ["https://growingcut.vercel.app"], "https://growingpots.kr/landing"),
         ]
         for m in migrations {

@@ -36,6 +36,7 @@ struct SelectView: View {
                     ctaButton
                 }
             }
+            .ignoresSafeArea() // Figma 아트보드(834×1194)는 상태바 포함 전체 화면 기준
         }
         .onAppear {
             startTimer()

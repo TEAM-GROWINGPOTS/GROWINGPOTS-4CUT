@@ -22,7 +22,7 @@ export function sessionTimes(blobs) {
 
 // ---------- 페이지 (Figma 5930:29633 "웹 ui" — #191919 다크 + 라임 토큰) ----------
 
-const INSTAGRAM_URL = process.env.GP_INSTAGRAM_URL || 'https://instagram.com/growinpots.official';
+const INSTAGRAM_URL = process.env.GP_INSTAGRAM_URL || 'https://instagram.com/growingpots.official';
 const LANDING_URL = process.env.GP_LANDING_URL || 'https://growingpots.kr/landing';
 
 // growing pots 워드마크 (Figma header-logo.svg 원본 패스 인라인, 141.69×33.67)

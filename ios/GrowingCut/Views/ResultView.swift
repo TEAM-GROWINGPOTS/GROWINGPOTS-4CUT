@@ -142,6 +142,7 @@ struct ResultView: View {
                     failedScreen(message)
                 }
             }
+            .ignoresSafeArea() // Figma 아트보드(834×1194)는 상태바 포함 전체 화면 기준
         }
         .task {
             let instagram = model.instagramURL.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -266,25 +267,31 @@ struct ResultView: View {
 
     private var completeScreen: some View {
         ZStack {
-            // 우하단 대형 네컷 스트립 실루엣 (bbox 364.37, 797.47, 630.12×690.89, −5.8°)
-            Image.bundled("complete-union-photostrip")
-                .rotationEffect(.degrees(-5.8))
-                .position(x: 679.43, y: 1142.92)
+            // 아트보드 밖으로 넘치는 장식만 클리핑 (Figma 클리핑 재현)
+            ZStack {
+                // 우하단 대형 네컷 스트립 실루엣 (bbox 364.37, 797.47, 630.12×690.89, −5.8°)
+                Image.bundled("complete-union-photostrip")
+                    .rotationEffect(.degrees(-5.8))
+                    .position(x: 679.43, y: 1142.92)
 
-            // 배경 콘페티 (−57.69, 250.61, 891.69×691.72)
-            Image.bundled("complete-confetti-bg")
-                .position(x: 388.16, y: 596.47)
+                // 배경 콘페티 (−57.69, 250.61, 891.69×691.72)
+                Image.bundled("complete-confetti-bg")
+                    .position(x: 388.16, y: 596.47)
+            }
+            .frame(width: 834, height: 1194)
+            .clipped()
 
-            // 상단 화이트 그라디언트 워시 (CSS 141.676° → UnitPoint 환산)
+            // 상단 화이트 그라디언트 워시 — Figma 실렌더 보정(0.74 @0 → 0 @0.87, 홈 화면과 동일).
+            // 레터박스 gap 라인이 안 보이게 상·좌·우 블리드.
             LinearGradient(
                 stops: [
-                    .init(color: .white.opacity(0.74), location: 0.44519),
-                    .init(color: .white.opacity(0), location: 0.78458),
+                    .init(color: .white.opacity(0.74), location: 0),
+                    .init(color: .white.opacity(0), location: 0.87),
                 ],
                 startPoint: UnitPoint(x: 0.0448, y: -0.0328),
                 endPoint: UnitPoint(x: 0.9552, y: 1.0328)
             )
-            // 대각선 그라데이션의 rect 하단 잘림('흰 박스' 모서리) 방지 — 홈 화면과 동일한 하단 페이드
+            // 대각선 그라데이션의 rect 하단 잘림('흰 박스' 모서리) 방지 — 하단 페이드
             .mask(
                 LinearGradient(
                     stops: [
@@ -296,7 +303,7 @@ struct ResultView: View {
                     endPoint: .bottom
                 )
             )
-            .placed(x: -0.49, y: 0.48, w: 834.49, h: 902.18)
+            .placed(x: -40.49, y: -19.52, w: 914.49, h: 942.18)
             .allowsHitTesting(false)
 
             // 체크 배지 (bbox 668.89, 295.46, 88.32×86.85, 28.86°)
@@ -342,7 +349,7 @@ struct ResultView: View {
             .buttonStyle(PrimaryButtonStyle(fontSize: 20, horizontalPadding: 28, verticalPadding: 16))
             .position(x: 123.5, y: 84.74)
         }
-        .clipped() // 스트립 실루엣·콘페티가 아트보드 밖으로 나가는 부분 잘라냄
+        // 클리핑은 장식 그룹에만 적용 — 흰 그라데이션은 레터박스까지 블리드되어야 함
     }
 
     /// 완료 화면 대형 QR 카드 (흰 배경, 3pt gray-800 테두리, radius 6.902)

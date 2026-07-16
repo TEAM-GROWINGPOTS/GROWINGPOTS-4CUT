@@ -18,17 +18,9 @@ struct CaptureView: View {
         ZStack {
             Color.black.ignoresSafeArea()
 
+            // Figma 시안에는 저장 영역 가이드(점선 박스)가 없다 — 프리뷰만 풀블리드
             CameraPreview(camera: camera, guideRect: $guideRect)
                 .ignoresSafeArea()
-
-            // 저장 영역 가이드
-            if camera.status == .ready, !guideRect.isNull {
-                Rectangle()
-                    .path(in: guideRect)
-                    .stroke(style: StrokeStyle(lineWidth: 2, dash: [10, 8]))
-                    .foregroundStyle(.white.opacity(0.4))
-                    .ignoresSafeArea()
-            }
 
             statusOverlay
 
