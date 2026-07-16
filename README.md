@@ -1,138 +1,169 @@
-# growing pots — 아이패드 인생네컷 앱 (구 GROWING CUT)
+<div align="center">
 
-아이패드로 찍는 셀프 네컷 부스입니다. 졸업식 컨셉 "growing pots" 디자인(Figma 시안 1:1 재현)이 적용되어 있어요. (아이폰에서도 실행됩니다 — 세로 고정, 카메라 흐름 테스트 용도로 유용해요.)
+# 🎓 growing pots
 
-**흐름:** 홈 → `촬영 시작` → 전면 카메라가 5초 타이머로 6컷 자동 촬영(각 컷 동안 영상도 함께 녹화) → 6컷 중 4컷 선택 + 프레임(라임/블랙/화이트) 선택 — **40초 제한, 만료 시 자동 진행** → 네컷 합성(우측 상단 QR 포함) → 업로드 대기 중 Instagram/랜딩 QR 노출 → 완료 화면 QR → 휴대폰으로 QR을 찍으면 **4시간짜리 임시 링크**에서 네컷 사진과 '움직이는 네컷' 영상을 저장할 수 있어요.
+**말하는 감자의 무사 졸업 프로젝트 — 아이패드 인생네컷 부스**
+
+전면 카메라로 6컷을 자동 촬영하고, 4컷을 골라 프레임에 합성한 뒤,
+QR 하나로 사진과 '움직이는 네컷' 영상을 나눠 갖는 셀프 포토부스입니다.
+
+[![iOS](https://img.shields.io/badge/iOS-17%2B-black?logo=apple)](#2-앱-실행-아이패드--아이폰)
+[![SwiftUI](https://img.shields.io/badge/SwiftUI-Figma%201%3A1-D7F856)](#디자인)
+[![Server](https://img.shields.io/badge/Server-Vercel%20%2B%20Blob-191919?logo=vercel)](#1-공유-서버)
+[![Domain](https://img.shields.io/badge/QR-4--cut.growingpots.kr-C4E936)](https://4-cut.growingpots.kr)
+
+</div>
+
+---
+
+## 화면
+
+| 홈 | 선택 (40초) | 생성 중 | 대기 | 완료 |
+|:---:|:---:|:---:|:---:|:---:|
+| ![홈](docs/images/screen-home.png) | ![선택](docs/images/screen-select.png) | ![생성 중](docs/images/screen-generating.png) | ![대기](docs/images/screen-waiting.png) | ![완료](docs/images/screen-complete.png) |
+
+**흐름:** 촬영 시작 → 전면 카메라 5초 타이머 × **6컷** 자동 촬영(컷마다 영상 동시 녹화) → **4컷 선택 + 프레임 선택** (40초 제한, 만료 시 자동 진행) → 합성(우상단 QR 포함) → 생성 3초·대기 3초 화면을 거쳐 → 완료 화면 QR → 휴대폰으로 스캔하면 **4시간 임시 링크**에서 사진·영상 저장.
+
+### 프레임 & 결과물
+
+| 라임 | 블랙 | 화이트 | 합성 결과 | 모바일 웹 |
+|:---:|:---:|:---:|:---:|:---:|
+| ![라임](docs/images/frame-lime.png) | ![블랙](docs/images/frame-black.png) | ![화이트](docs/images/frame-white.png) | ![결과](docs/images/still-sample.png) | ![웹](docs/images/web-pickup.png) |
+
+QR로 열리는 웹 페이지는 사진/영상 **스냅 캐러셀**로, 저장 버튼과 함께 Instagram·랜딩 페이지 링크를 제공합니다.
+
+## 구조
 
 ```
 growingcut/
 ├── ios/                 # 아이패드 앱 (SwiftUI, iOS 17+, 세로 고정)
 │   ├── GrowingCut.xcodeproj
 │   ├── GrowingCut/
-│   │   ├── App/         # 앱 진입점, 화면 흐름 상태
+│   │   ├── App/         # 앱 진입점, 화면 흐름 상태 (6컷·40초 규칙)
 │   │   ├── Views/       # 홈 / 촬영 / 선택 / 결과(생성중·대기·완료) / 설정
 │   │   ├── Camera/      # AVCaptureSession (사진 + 클립 동시 캡처)
 │   │   ├── Rendering/   # 네컷 합성 코어 (iOS/macOS 공용, UIKit 무의존)
-│   │   ├── Networking/  # 업로드 클라이언트
-│   │   └── Resources/   # 프레임 오버레이 PNG · UI 에셋 · Pretendard 폰트
+│   │   ├── Networking/  # 업로드 클라이언트 (X-GC-Key)
+│   │   └── Resources/   # 프레임 오버레이 PNG · UI 에셋 · Pretendard 폰트(OFL)
 │   └── Support/Info.plist
-├── server/              # 4시간 임시 링크 공유 서버 (Node 18+, 무의존)
-├── vercel/              # 프로덕션 공유 서버 (Vercel + Blob)
-└── tools/               # macOS 검증 도구 (합성 결과 확인용)
+├── server/              # LAN 데모용 공유 서버 (Node 18+, 무의존)
+├── vercel/              # 프로덕션 공유 서버 (Vercel Functions + Blob)
+├── tools/               # macOS 검증 도구 (기기 없이 합성 코어 검증)
+└── docs/images/         # README 갤러리
 ```
+
+## 디자인
+
+Figma 시안(iPad Pro 11" 세로, 834×1194)을 **좌표 1:1**로 재현했습니다.
+
+- **토큰**: lime-400 `#E3FF75` · lime-500 `#D7F856` · lime-600 `#C4E936` · gray-800 `#242424` · gray-900 `#191919`, **Pretendard** (번들, OFL)
+- **`ScaledStage`**: 모든 화면은 834×1194 고정 캔버스에 Figma 좌표 그대로 그려지고 기기에 맞춰 통째로 스케일됩니다 (풀블리드, 상태바 포함)
+- **프레임 = 오버레이 PNG**: 사진 슬롯 4개(각 480×675.5)와 QR 창이 투명하게 뚫린 1080×1920 PNG. 렌더러가 *사진 → 오버레이 → QR* 순서로 그립니다. **프레임 추가 = PNG 1장 + 썸네일 + `FrameStyle.all` 1줄**
 
 ## 실행 방법
 
-공유 서버는 두 가지 방식 중 하나로 운영합니다:
+### 1) 공유 서버
 
-| | 로컬 서버 (`server/`) | Vercel 배포 (`vercel/`) |
+프로덕션은 **https://4-cut.growingpots.kr** 에 배포돼 있습니다 (앱 기본값 — 설정 불필요).
+
+| | 로컬 서버 (`server/`) | Vercel (`vercel/`) |
 |---|---|---|
-| 요건 | 맥이 켜져 있고 같은 와이파이 | 무료 Vercel 계정 |
+| 요건 | 맥 + 같은 와이파이 | — (배포됨) |
 | QR 접속 | 같은 와이파이에서만 | **어디서든 (셀룰러 포함)** |
-| 만료 처리 | 접근 시 410 + 30분마다 정리 | 접근 시 410+즉시 삭제 + 크론 정리 |
+| 만료 처리 | 접근 시 410 + 30분 주기 정리 | 접근 시 410 + 즉시 삭제 + 일일 크론 |
 
-### 0) Vercel로 배포하기 (권장 — 어디서든 QR이 열림)
+<details>
+<summary><b>Vercel 배포/운영 상세</b></summary>
 
 ```bash
 cd vercel
-npx vercel login          # 브라우저에서 로그인 (1회)
-npx vercel link           # 프로젝트 생성/연결 (1회)
 npx vercel deploy --prod
 ```
 
-1회 설정: Vercel 대시보드 → 프로젝트 → **Storage → Blob store 생성 후 연결** (BLOB_READ_WRITE_TOKEN이 자동 주입됩니다).
-선택 설정(환경변수): `GC_UPLOAD_KEY`(아무나 업로드 못 하게 하는 키 — 앱 ⚙️의 '업로드 키'에 같은 값 입력), `TTL_HOURS`(기본 4), `CRON_SECRET`(크론 보호).
+- 1회 설정: 대시보드 → Storage → **Blob store 연결** (`BLOB_READ_WRITE_TOKEN` 자동 주입)
+- 환경변수: `GC_UPLOAD_KEY`(업로드 보호 — **설정됨**, 앱 기본 키와 일치), `TTL_HOURS`(기본 4), `CRON_SECRET`, `GP_INSTAGRAM_URL`/`GP_LANDING_URL`(웹 푸터 링크 재정의)
+- 영상은 서버리스 본문 한도(4.5MB) 안에 들도록 비트레이트 캡 (5초 ≈ 2.2MB)
+- **Hobby 플랜 참고**: Blob 고급 연산을 아끼도록 업로드는 `put` 1회(결정적 경로+덮어쓰기), 페이지 조회는 `head` 2회로 동작 — 월 2K 한도 기준 **~1,000세션**. 한도 초과 시 하드 차단(30일)이므로 행사 전 대시보드 Usage 확인 권장. 크론은 Hobby 제한(1일 1회)에 맞춰 daily
 
-프로덕션 도메인은 **https://4-cut.growingpots.kr** 입니다 (앱 기본값이라 따로 입력할 필요 없음; 다른 배포를 쓰면 앱 ⚙️에서 변경). 영상은 서버리스 요청 한도(4.5MB) 안에 들도록 비트레이트가 캡되어 있어요(5초 ≈ 2.2MB).
-대기 화면·웹 페이지의 프로모 링크 기본값: 인스타 `instagram.com/growingpots.official`, 랜딩 `growingpots.kr/landing` (웹은 `GP_INSTAGRAM_URL`/`GP_LANDING_URL` 환경변수로 재정의).
-참고: Hobby 플랜 크론은 하루 1회까지라 `vercel.json`의 스케줄이 daily로 되어 있습니다. 만료 정확성은 페이지 접근 시점에 항상 강제되므로(410 + 즉시 삭제) 크론은 용량 회수용입니다.
+</details>
 
-### 1) 공유 서버 켜기 (맥)
+<details>
+<summary><b>로컬 LAN 서버로 데모</b></summary>
 
 ```bash
 node server/server.js
+# 출력된 주소(예: http://192.168.0.10:8787)를 앱 ⚙️에 입력
 ```
 
-시작하면 앱에 입력할 주소가 출력됩니다. 예:
+인증 없는 같은-와이파이 데모용입니다. 공용 인터넷에 노출하지 마세요.
 
-```
-앱 설정(⚙️)에 아래 주소 중 하나를 입력하세요:
-  http://localhost:8787      (시뮬레이터 전용)
-  http://192.168.0.10:8787   (en0 — 실기기/휴대폰용)
-```
-
-- 업로드된 사진·영상은 **4시간 뒤 자동 삭제**됩니다 (`TTL_HOURS`, `PORT`, `DATA_DIR` 환경변수로 조절).
-- 인증이 없는 **같은 와이파이(LAN) 데모용** 서버입니다. 공용 인터넷에 그대로 노출하지 마세요.
+</details>
 
 ### 2) 앱 실행 (아이패드 / 아이폰)
 
-1. `ios/GrowingCut.xcodeproj`를 Xcode(16+)로 엽니다.
-2. Signing & Capabilities에서 팀만 선택하고 기기에 실행합니다.
-3. 앱 메인 화면 우측 상단 ⚙️에서 서버 주소(위 LAN 주소)를 입력하고 `연결 테스트`로 확인합니다.
-4. 촬영 기기와 QR을 찍을 휴대폰이 **같은 와이파이**에 있어야 링크가 열립니다.
+1. `ios/GrowingCut.xcodeproj`를 Xcode 16+로 열고 팀만 선택해 실행
+2. 서버 주소·업로드 키는 기본값으로 이미 프로덕션에 연결됨 (⚙️에서 변경 가능)
+3. 시뮬레이터에는 카메라가 없으므로 홈의 **데모 촬영** 버튼으로 전체 흐름 확인
 
-Xcode 없이 CLI로 실기기에 설치하려면 (기기 USB 연결 + 개발자 모드 필요):
-
-```bash
-cd ios
-xcodebuild -project GrowingCut.xcodeproj -target GrowingCut -configuration Debug \
-  -sdk iphoneos DEVELOPMENT_TEAM=<팀ID> \
-  -allowProvisioningUpdates -allowProvisioningDeviceRegistration build
-xcrun devicectl list devices                # 기기 식별자 확인
-xcrun devicectl device install app --device <식별자> build/Debug-iphoneos/GrowingCut.app
-```
-
-처음 설치라면 아이폰의 `설정 → 일반 → VPN 및 기기 관리`에서 개발자 앱을 신뢰해야 실행됩니다.
-
-시뮬레이터에는 카메라가 없으므로 메인 화면의 **`데모 촬영`** 버튼으로 전체 흐름(합성→업로드→QR)을 확인할 수 있습니다.
-
-CLI 빌드:
+<details>
+<summary><b>CLI로 빌드/설치</b></summary>
 
 ```bash
 cd ios
+# 시뮬레이터
 xcodebuild -project GrowingCut.xcodeproj -target GrowingCut \
   -configuration Debug -sdk iphonesimulator CODE_SIGNING_ALLOWED=NO build
+
+# 실기기 (공유 스킴 필수 — -target은 기기 등록을 건너뜀)
+xcodebuild -project GrowingCut.xcodeproj -scheme GrowingCut -configuration Debug \
+  -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build/dd \
+  DEVELOPMENT_TEAM=<팀ID> -allowProvisioningUpdates build
+xcrun devicectl list devices
+xcrun devicectl device install app --device <식별자> build/dd/Build/Products/Debug-iphoneos/GrowingCut.app
 ```
+
+</details>
 
 ## 촬영 규칙 (기본값)
 
 | 항목 | 값 | 위치 |
 |---|---|---|
-| 촬영 컷 수 | 6컷 | `AppModel.shotCount` |
-| 컷당 타이머 | 5초 | `AppModel.countdownSeconds` |
-| 선택 컷 수 | 4컷 (제한 40초, 만료 시 자동 채움) | `AppModel.pickCount` / `selectionSeconds` |
+| 촬영 컷 수 | 6컷 × 5초 타이머 | `AppModel.shotCount` / `countdownSeconds` |
+| 선택 | 4컷, **40초 제한** (만료 시 자동 채움) | `AppModel.pickCount` / `selectionSeconds` |
+| 결과 화면 | 생성 최소 3초 → 대기 최소 3초 → 완료 | `ResultView.DisplayStep` |
 | 링크 유효 시간 | 4시간 | 서버 `TTL_HOURS` |
-| 이미지 | 1080×1920 JPEG, QR 우측 상단 (862.84, 63) | `LayoutSpec` |
+| 이미지 | 1080×1920 JPEG, QR 우상단 (862.84, 63) | `LayoutSpec` |
 | 영상 | 540×960 30fps H.264, 길이 = 가장 짧은 클립 | `VideoComposer` |
-
-**프레임 시스템 (오버레이 PNG):** 프레임 디자인은 슬롯 4개(각 480×675.5)와 QR 창이 투명하게 뚫린 1080×1920 PNG(`ios/GrowingCut/Resources/Frames/frame-*.png`)입니다. 렌더러는 사진을 슬롯 아래에 깔고 오버레이를 덮은 뒤 QR을 그립니다. **프레임 추가 = 오버레이 PNG 1장 + 썸네일 + `FrameStyle.all` 1줄.** 스틸과 영상 오버레이가 같은 렌더러(`FrameRenderer`)를 씁니다. 현재 3종: 라임/블랙/화이트 (Figma 시안).
 
 ## 검증 도구 (macOS)
 
-카메라·기기 없이 합성 코어를 검증합니다.
+렌더링 코어가 UIKit 무의존이라 기기 없이 맥에서 검증합니다.
 
 ```bash
-# 오버레이 알파 검증 + 합성 스틸(3종) + 움직이는 네컷 + QR 디코드 + 프레임 추출
+# 오버레이 알파 검증 + 스틸 3종 + 움직이는 네컷 + QR 디코드
 xcrun swiftc -parse-as-library -O -o /tmp/preview tools/preview.swift ios/GrowingCut/Rendering/*.swift
 /tmp/preview /tmp/preview-out ios/GrowingCut/Resources/Frames
 
-# 영상 파일 길이/크기/프레임 확인, 이미지 QR 디코드
+# 영상 길이/크기/프레임 확인, 이미지 QR 디코드
 xcrun swiftc -parse-as-library -O -o /tmp/probe tools/probe.swift
 /tmp/probe <영상.mp4> <출력 디렉터리>
 /tmp/probe --qr <이미지.jpg>
-```
 
-시뮬레이터 자동 데모 (UI 조작 없이 파이프라인 실행):
-
-```bash
-xcrun simctl launch <UDID> com.growingcut.app -autoDemo     # 곧장 결과 화면까지
+# 시뮬레이터 자동 데모 (UI 조작 없이 파이프라인 완주)
+xcrun simctl launch <UDID> com.growingcut.app -autoDemo     # 결과 화면까지
 xcrun simctl launch <UDID> com.growingcut.app -demoSelect   # 선택 화면까지
 ```
 
 ## 구현 노트
 
-- **영상 합성은 AVAssetReader → CoreImage → AVAssetWriter 직접 파이프라인**입니다. `AVMutableComposition` + `AVVideoCompositionCoreAnimationTool` 조합은 iOS/macOS 26에서 deprecated인 데다 CLI 환경에서 동작하지 않아(-11800/-12780), 전 플랫폼에서 검증 가능한 인프로세스 방식을 채택했습니다. 회전(90°)·미러(전면 카메라) 클립 복원은 `tools/preview.swift`의 회전/미러 저장 케이스로 검증돼 있습니다.
-- **전면 카메라 산출물은 미리보기(셀피)와 동일하게 미러링**되어 저장됩니다.
-- 렌더링 코어(`ios/GrowingCut/Rendering/`)는 UIKit 의존이 없어 macOS 도구와 iOS 앱이 같은 코드를 컴파일합니다.
-- 업로드는 `PUT /api/s/:id/photo|video` 두 번이 전부라 실패 시 같은 ID로 재시도해도 QR(이미지에 이미 박힌 링크)이 그대로 유효합니다.
-- `Info.plist`의 `NSAllowsArbitraryLoads`는 LAN http 데모용입니다. 실서비스 배포 시 https 서버로 바꾸고 예외를 좁히세요.
+- **영상 합성은 AVAssetReader → CoreImage → AVAssetWriter 직접 파이프라인.** `AVMutableComposition`+CoreAnimationTool은 iOS/macOS 26에서 deprecated이고 CLI에서 동작하지 않아(-11800/-12780) 전 플랫폼 검증 가능한 인프로세스 방식을 사용. 회전·미러 클립 복원은 preview 도구의 저장 케이스로 검증됨
+- **전면 카메라 산출물은 미리보기(셀피)와 동일하게 미러링** 저장
+- 업로드는 `PUT /api/s/:id/photo|video` 두 번이 전부 — 실패 시 같은 ID 재시도로 QR(이미지에 박힌 링크)이 그대로 유효
+- Figma 그라데이션의 CSS 내보내기는 실렌더와 다를 수 있음 — 흰 워시는 노드 단독 캡처 기준으로 보정됨
+- `Info.plist`의 `NSAllowsArbitraryLoads`는 LAN http 데모용 — 실서비스만 쓸 거면 좁힐 것
+
+---
+
+<div align="center">
+<sub>🥔 감자들의 무사 졸업을 기원합니다 · Figma 시안 1:1 · Pretendard(OFL) 동봉</sub>
+</div>
