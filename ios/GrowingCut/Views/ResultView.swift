@@ -126,24 +126,31 @@ struct ResultView: View {
     @State private var instagramQR: CGImage?
     @State private var landingQR: CGImage?
 
+    /// 표시 단계 — 엔진 진행과 별개로 생성(4)·대기(5) 화면을 각각 최소 3초 보여준다.
+    /// 실제 합성/업로드는 뒤에서 그대로 진행되고 화면 전환만 지연된다.
+    private enum DisplayStep: Int { case generating = 0, waiting = 1, done = 2 }
+    @State private var displayStep: DisplayStep = .generating
+    @State private var displaySince = Date()
+    private static let minDwell: TimeInterval = 3
+
     var body: some View {
         ZStack {
             backgroundColor.ignoresSafeArea()
 
             ScaledStage {
-                switch engine.phase {
-                case .renderingStill, .composingVideo:
-                    generatingScreen
-                case .uploading:
-                    waitingScreen
-                case .done:
-                    completeScreen
-                case .failed(let message):
+                if case .failed(let message) = engine.phase {
                     failedScreen(message)
+                } else {
+                    switch displayStep {
+                    case .generating: generatingScreen
+                    case .waiting: waitingScreen
+                    case .done: completeScreen
+                    }
                 }
             }
             .ignoresSafeArea() // Figma 아트보드(834×1194)는 상태바 포함 전체 화면 기준
         }
+        .task(id: engine.phase) { await advanceDisplay() }
         .task {
             let instagram = model.instagramURL.trimmingCharacters(in: .whitespacesAndNewlines)
             if instagramQR == nil, !instagram.isEmpty {
@@ -165,8 +172,42 @@ struct ResultView: View {
 
     /// 완료 화면만 라임, 나머지는 다크 (스테이지 밖 풀블리드 배경)
     private var backgroundColor: Color {
-        if case .done = engine.phase { return Theme.lime400 }
-        return Theme.gray800
+        if case .failed = engine.phase { return Theme.gray800 }
+        return displayStep == .done ? Theme.lime400 : Theme.gray800
+    }
+
+    /// 엔진 단계 → 목표 표시 단계 (failed는 body에서 즉시 처리)
+    private func targetStep(_ phase: ResultEngine.Phase) -> DisplayStep {
+        switch phase {
+        case .renderingStill, .composingVideo: return .generating
+        case .uploading: return .waiting
+        case .done: return .done
+        case .failed: return displayStep // 실패 중에는 전진하지 않는다
+        }
+    }
+
+    /// 표시 단계를 한 칸씩 전진시키되 각 단계를 최소 minDwell 초 유지한다.
+    /// task(id: engine.phase)가 단계마다 재시작돼도 displayStep 기준으로 이어서 동작한다.
+    private func advanceDisplay() async {
+        if case .failed = engine.phase { return }
+        // 재시도 등으로 엔진이 뒤 단계로 돌아오면 즉시 맞춘다
+        if displayStep.rawValue > targetStep(engine.phase).rawValue {
+            displayStep = targetStep(engine.phase)
+            displaySince = Date()
+            return
+        }
+        while displayStep.rawValue < targetStep(engine.phase).rawValue {
+            let remaining = Self.minDwell - Date().timeIntervalSince(displaySince)
+            if remaining > 0 {
+                try? await Task.sleep(nanoseconds: UInt64(remaining * 1_000_000_000))
+                if Task.isCancelled { return }
+            }
+            guard let next = DisplayStep(rawValue: displayStep.rawValue + 1) else { return }
+            withAnimation(.easeInOut(duration: 0.25)) {
+                displayStep = next
+                displaySince = Date()
+            }
+        }
     }
 
     /// iOS 기본 스피너를 lime-500 틴트 + 약 83×84pt로 확대.
@@ -329,7 +370,7 @@ struct ResultView: View {
             .placed(x: 274.86, y: 178.12, w: 284.28, h: 505.38)
 
             // 높이는 고정하지 않는다 — Pretendard 고유 라인박스(>24pt) 때문에 108pt 고정 시 말줄임 발생
-            Text("감사합니다!\n자 이제 QR을 통해 \n이미지를 다운로드하세요!")
+            Text("사진이 생성되었어요.\nQR코드를 통해 이미지와 영상을 확인해 보세요!")
                 .font(.pretendard(24, .semiBold))
                 .lineSpacing(12) // line-height 1.5 = 36pt
                 .multilineTextAlignment(.center)

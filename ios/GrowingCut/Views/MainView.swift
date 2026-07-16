@@ -40,14 +40,15 @@ struct MainView: View {
                         .position(x: 417, y: 451 - 20)
 
                     // 카피 2줄: rect (214.5, 245.07, 405×90), Bold 32 / line-height 1.4 / -0.32
-                    Text("감사한 사람들과 함께하는 졸업식\n자 이제 사진 찍자!")
+                    // 새 카피가 시안(405pt)보다 길어 프레임을 넓혀 의도한 2줄 유지
+                    Text("말하는 감자의 무사 졸업 프로젝트, Growing Pots.\n졸업의 순간을 네컷으로 남겨보세요!")
                         .font(.pretendard(32, .bold))
                         .kerning(-0.32)
                         .lineSpacing(12.8)          // 44.8pt 행높이 − 32pt 폰트
                         .padding(.vertical, 6.4)    // 행높이 여백(하프 리딩) 보정
                         .foregroundStyle(Theme.gray600)
                         .multilineTextAlignment(.center)
-                        .frame(width: 405)
+                        .frame(width: 790)
                         .position(x: 417, y: 290.07)
 
                     // img_logo1 — growing pots 로고: rect (217.12, 406.07, 399.76×226.41)
