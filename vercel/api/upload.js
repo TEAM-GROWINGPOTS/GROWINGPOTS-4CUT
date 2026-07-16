@@ -1,5 +1,5 @@
-import { put, list, del } from '@vercel/blob';
-import { ID_RE, KINDS, sessionPrefix, sessionTimes } from './_shared.js';
+import { put } from '@vercel/blob';
+import { ID_RE, KINDS, TTL_MS, sessionPrefix } from './_shared.js';
 
 // 서버리스 함수 요청 본문 제한(4.5MB) 아래에서 동작. 앱은 영상 비트레이트를 캡해 이 안에 들어온다.
 const MAX_BODY = Math.floor(4.4 * 1024 * 1024);
@@ -27,36 +27,19 @@ export default async function handler(req, res) {
   if (!body) return res.status(400).json({ ok: false, error: 'empty body' });
   if (body.length > MAX_BODY) return res.status(413).json({ ok: false, error: 'too large' });
 
-  const prefix = sessionPrefix(id);
-  const existing = await list({ prefix });
-
-  // 세션 만료 후 재사용 방지
-  if (existing.blobs.length > 0) {
-    const { expiresAt } = sessionTimes(existing.blobs);
-    if (Date.now() > expiresAt) {
-      await del(existing.blobs.map((b) => b.url));
-      return res.status(410).json({ ok: false, error: 'expired' });
-    }
-  }
-
-  // 같은 종류의 이전 업로드(재시도)는 교체 (랜덤 suffix 때문에 파일명 앞부분으로 매칭)
-  const stale = existing.blobs.filter((b) =>
-    (b.pathname.split('/').pop() || '').startsWith(kind)
-  );
-  if (stale.length > 0) {
-    await del(stale.map((b) => b.url));
-  }
-
-  await put(`${prefix}${KINDS[kind].file}`, body, {
+  // 결정적 경로 + 덮어쓰기 — 업로드당 Blob 고급 연산을 put 1회로 최소화 (Hobby 월 2K 한도 대비).
+  // 랜덤 suffix를 빼도 세션 ID(10자 랜덤) 자체가 페이지 URL과 같은 엔트로피라 URL 추측 방어는 동등하다.
+  // 재시도는 같은 경로를 덮어쓰고, 만료 판정은 페이지 접근 시 uploadedAt 기준으로 수행된다.
+  await put(`${sessionPrefix(id)}${KINDS[kind].file}`, body, {
     access: 'public',
     contentType: KINDS[kind].type,
-    addRandomSuffix: true, // URL 추측 방지 — 조회는 항상 list()로
+    addRandomSuffix: false,
+    allowOverwrite: true,
     cacheControlMaxAge: 300,
   });
 
-  const after = await list({ prefix });
-  const { expiresAt } = sessionTimes(after.blobs);
-  return res.status(200).json({ ok: true, id, kind, bytes: body.length, expiresAt });
+  // expiresAt은 근사값(첫 업로드가 사진이므로 실제와 수십 초 이내) — 앱은 이 값을 표시하지 않는다
+  return res.status(200).json({ ok: true, id, kind, bytes: body.length, expiresAt: Date.now() + TTL_MS });
 }
 
 async function readBody(req) {
