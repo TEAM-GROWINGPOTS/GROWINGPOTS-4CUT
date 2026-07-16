@@ -285,7 +285,8 @@ struct ResultView: View {
             // 레터박스 gap 라인이 안 보이게 상·좌·우 블리드.
             LinearGradient(
                 stops: [
-                    .init(color: .white.opacity(0.74), location: 0),
+                    // 사용자 요청으로 최대 강도 0.74 → 0.60 (홈 화면과 동일)
+                    .init(color: .white.opacity(0.60), location: 0),
                     .init(color: .white.opacity(0), location: 0.87),
                 ],
                 startPoint: UnitPoint(x: 0.0448, y: -0.0328),

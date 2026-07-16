@@ -149,7 +149,8 @@ struct MainView: View {
         // 연속으로 감쇠하는 형태라 그에 맞춰 0.74 @0 → 0 @0.87로 보정했다.
         LinearGradient(
             stops: [
-                .init(color: .white.opacity(0.74), location: 0),
+                // 사용자 요청으로 최대 강도 0.74 → 0.60 (기기에서 너무 하얗게 보임)
+                .init(color: .white.opacity(0.60), location: 0),
                 .init(color: .white.opacity(0), location: 0.87),
             ],
             startPoint: UnitPoint(x: 0.0447, y: -0.0326),
