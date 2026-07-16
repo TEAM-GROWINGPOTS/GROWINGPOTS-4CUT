@@ -23,34 +23,20 @@ struct RGBA: Equatable {
     static let black = RGBA.hex(0x000000)
 }
 
+/// 인쇄 프레임 변형. 디자인은 슬롯·QR창이 투명하게 뚫린 오버레이 PNG(1080×1920)로 공급된다.
+/// 프레임 추가 = 오버레이 PNG 1장 + 썸네일 + 아래 항목 1줄.
 struct FrameStyle: Identifiable, Equatable {
-    enum Background: Equatable {
-        case solid(RGBA)
-        case verticalGradient(RGBA, RGBA) // 위 → 아래
-    }
-
     let id: String
     let name: String
-    let background: Background
-    let text: RGBA
-    let sprockets: Bool        // 필름 구멍 장식
-    let cellCornerRadius: CGFloat
-
-    /// 스타일 칩/미리보기에 쓸 대표색
-    var swatch: RGBA {
-        switch background {
-        case .solid(let c): return c
-        case .verticalGradient(let a, _): return a
-        }
-    }
+    /// 번들 리소스의 오버레이 PNG 이름 (확장자 제외)
+    let overlayAssetName: String
+    /// 프레임 선택 UI 썸네일 에셋 이름
+    let thumbAssetName: String
 
     static let all: [FrameStyle] = [
-        FrameStyle(id: "white", name: "화이트", background: .solid(.hex(0xFFFFFF)), text: .hex(0x17171B), sprockets: false, cellCornerRadius: 0),
-        FrameStyle(id: "black", name: "블랙", background: .solid(.hex(0x101014)), text: .hex(0xF4F4F6), sprockets: false, cellCornerRadius: 0),
-        FrameStyle(id: "film", name: "필름", background: .solid(.hex(0x050505)), text: .hex(0xFFFFFF), sprockets: true, cellCornerRadius: 10),
-        FrameStyle(id: "pink", name: "핑크", background: .solid(.hex(0xFFD9E8)), text: .hex(0xC2447A), sprockets: false, cellCornerRadius: 18),
-        FrameStyle(id: "sky", name: "스카이", background: .solid(.hex(0xD9ECFF)), text: .hex(0x2A6AB8), sprockets: false, cellCornerRadius: 18),
-        FrameStyle(id: "sunset", name: "선셋", background: .verticalGradient(.hex(0xFFDCA8), .hex(0xFF8FA3)), text: .hex(0x86364E), sprockets: false, cellCornerRadius: 18),
+        FrameStyle(id: "lime", name: "라임", overlayAssetName: "frame-lime", thumbAssetName: "thumb-frame-lime"),
+        FrameStyle(id: "black", name: "블랙", overlayAssetName: "frame-black", thumbAssetName: "thumb-frame-black"),
+        FrameStyle(id: "white", name: "화이트", overlayAssetName: "frame-white", thumbAssetName: "thumb-frame-white"),
     ]
 
     static func byID(_ id: String) -> FrameStyle {

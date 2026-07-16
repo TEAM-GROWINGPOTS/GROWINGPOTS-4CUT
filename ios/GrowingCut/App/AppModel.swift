@@ -19,9 +19,11 @@ enum Stage: Equatable {
 @MainActor
 final class AppModel: ObservableObject {
     // 촬영 규칙
-    let shotCount = 8
+    let shotCount = 6
     let pickCount = 4
     let countdownSeconds = 5
+    /// 선택 화면 제한 시간(초) — 만료 시 부족분을 촬영 순서대로 채워 자동 진행
+    let selectionSeconds = 40
 
     @Published var stage: Stage = .main
     @Published var shots: [Shot] = []
@@ -35,6 +37,9 @@ final class AppModel: ObservableObject {
     @AppStorage("serverBaseURL") var serverBaseURL: String = "http://localhost:8787"
     /// 공개 서버(GC_UPLOAD_KEY 설정 시)용 업로드 키 — 비어 있으면 헤더를 보내지 않는다
     @AppStorage("uploadKey") var uploadKey: String = ""
+    // 생성 대기 화면 프로모 QR 링크 (플레이스홀더 — 설정에서 변경)
+    @AppStorage("instagramURL") var instagramURL: String = "https://instagram.com/growingpots"
+    @AppStorage("landingURL") var landingURL: String = "https://growingcut.vercel.app"
 
     private(set) var sessionDir: URL = FileManager.default.temporaryDirectory
         .appendingPathComponent("growingcut-session", isDirectory: true)
@@ -90,7 +95,7 @@ final class AppModel: ObservableObject {
                 self.picked = []
                 self.demoBuilding = false
                 if autoAdvance {
-                    self.confirmSelection(Array(result.prefix(self.pickCount)), style: .byID("film"))
+                    self.confirmSelection(Array(result.prefix(self.pickCount)), style: .byID("lime"))
                 } else {
                     self.stage = .select
                 }

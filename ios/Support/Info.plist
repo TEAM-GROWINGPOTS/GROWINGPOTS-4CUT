@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>ko</string>
 	<key>CFBundleDisplayName</key>
-	<string>GROWING CUT</string>
+	<string>growing pots</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -34,6 +34,12 @@
 	<string>같은 와이파이에 있는 공유 서버로 네컷 사진과 영상을 업로드하기 위해 로컬 네트워크 접근이 필요해요.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>완성된 네컷 사진과 영상을 사진 앱에 저장하기 위해 필요해요.</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Pretendard-Bold.otf</string>
+		<string>Pretendard-SemiBold.otf</string>
+		<string>Pretendard-Regular.otf</string>
+	</array>
 	<key>UILaunchScreen</key>
 	<dict/>
 	<key>UIRequiresFullScreen</key>

@@ -31,7 +31,7 @@ enum VideoComposer {
     /// - Parameters:
     ///   - clipURLs: 셀 순서(위→아래)대로 4개
     ///   - overlay: FrameRenderer.renderVideoOverlay 결과(셀 영역이 투명), scale 배율과 일치해야 함
-    ///   - scale: 레이아웃 좌표 → 렌더 픽셀 배율 (0.5 → 600×1800)
+    ///   - scale: 레이아웃 좌표 → 렌더 픽셀 배율 (0.5 → 540×960)
     static func compose(
         clipURLs: [URL],
         overlay: CGImage,
@@ -54,9 +54,14 @@ enum VideoComposer {
         var sources: [ClipSource] = []
         var common = min(maxSeconds, .greatestFiniteMagnitude)
         for (i, url) in clipURLs.enumerated() {
+            // 오버레이 PNG 슬롯 가장자리 AA 아래로 영상을 bleed만큼 크게 깔아 이음새를 가린다
             let source = try await ClipSource(
                 url: url,
-                cellRect: ciCellRect(layout.cellRects[i], scale: scale, renderHeight: renderSize.height)
+                cellRect: ciCellRect(
+                    layout.cellRects[i].insetBy(dx: -layout.cellBleed, dy: -layout.cellBleed),
+                    scale: scale,
+                    renderHeight: renderSize.height
+                )
             )
             sources.append(source)
             common = min(common, source.duration)
