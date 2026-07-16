@@ -11,7 +11,7 @@ struct SettingsSheet: View {
         NavigationStack {
             Form {
                 Section {
-                    TextField("http://192.168.0.10:8787", text: model.$serverBaseURL)
+                    TextField("https://4-cut.growingpots.kr", text: model.$serverBaseURL)
                         .keyboardType(.URL)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()

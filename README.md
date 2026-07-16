@@ -43,7 +43,8 @@ npx vercel deploy --prod
 1회 설정: Vercel 대시보드 → 프로젝트 → **Storage → Blob store 생성 후 연결** (BLOB_READ_WRITE_TOKEN이 자동 주입됩니다).
 선택 설정(환경변수): `GC_UPLOAD_KEY`(아무나 업로드 못 하게 하는 키 — 앱 ⚙️의 '업로드 키'에 같은 값 입력), `TTL_HOURS`(기본 4), `CRON_SECRET`(크론 보호).
 
-앱 ⚙️ 설정에 `https://<프로젝트명>.vercel.app`을 입력하면 끝. 영상은 서버리스 요청 한도(4.5MB) 안에 들도록 비트레이트가 캡되어 있어요(5초 ≈ 2.2MB).
+프로덕션 도메인은 **https://4-cut.growingpots.kr** 입니다 (앱 기본값이라 따로 입력할 필요 없음; 다른 배포를 쓰면 앱 ⚙️에서 변경). 영상은 서버리스 요청 한도(4.5MB) 안에 들도록 비트레이트가 캡되어 있어요(5초 ≈ 2.2MB).
+대기 화면·웹 페이지의 프로모 링크 기본값: 인스타 `instagram.com/growinpots.official`, 랜딩 `growingpots.kr/landing` (웹은 `GP_INSTAGRAM_URL`/`GP_LANDING_URL` 환경변수로 재정의).
 참고: Hobby 플랜 크론은 하루 1회까지라 `vercel.json`의 스케줄이 daily로 되어 있습니다. 만료 정확성은 페이지 접근 시점에 항상 강제되므로(410 + 즉시 삭제) 크론은 용량 회수용입니다.
 
 ### 1) 공유 서버 켜기 (맥)

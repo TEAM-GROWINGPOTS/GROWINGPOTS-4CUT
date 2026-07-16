@@ -145,5 +145,18 @@ struct MainView: View {
             startPoint: UnitPoint(x: 0.0447, y: -0.0326),
             endPoint: UnitPoint(x: 0.9553, y: 1.0326)
         )
+        // 대각선 그라데이션이라 rect 하단(y 902) 좌측은 알파 ≈0.45인 채로 잘려
+        // 수평 '흰 박스' 모서리가 생긴다. Figma 렌더에는 경계가 없으므로 하단을 페이드아웃.
+        .mask(
+            LinearGradient(
+                stops: [
+                    .init(color: .white, location: 0),
+                    .init(color: .white, location: 0.82),
+                    .init(color: .clear, location: 1),
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        )
     }
 }

@@ -284,6 +284,18 @@ struct ResultView: View {
                 startPoint: UnitPoint(x: 0.0448, y: -0.0328),
                 endPoint: UnitPoint(x: 0.9552, y: 1.0328)
             )
+            // 대각선 그라데이션의 rect 하단 잘림('흰 박스' 모서리) 방지 — 홈 화면과 동일한 하단 페이드
+            .mask(
+                LinearGradient(
+                    stops: [
+                        .init(color: .white, location: 0),
+                        .init(color: .white, location: 0.82),
+                        .init(color: .clear, location: 1),
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            )
             .placed(x: -0.49, y: 0.48, w: 834.49, h: 902.18)
             .allowsHitTesting(false)
 
