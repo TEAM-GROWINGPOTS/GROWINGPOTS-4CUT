@@ -60,7 +60,25 @@ struct SettingsSheet: View {
                 } footer: {
                     Text("서버에 GC_UPLOAD_KEY가 설정된 경우에만 입력하면 돼요. 아무나 업로드하지 못하게 막는 열쇠예요.")
                 }
+
+                Section {
+                    TextField("https://instagram.com/…", text: model.$instagramURL)
+                        .keyboardType(.URL)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .font(.system(size: 17, design: .monospaced))
+                    TextField("https://…", text: model.$landingURL)
+                        .keyboardType(.URL)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .font(.system(size: 17, design: .monospaced))
+                } header: {
+                    Text("대기 화면 QR 링크")
+                } footer: {
+                    Text("생성 대기 화면에 표시되는 Instagram / Landing Page QR의 링크예요. 비워 두면 해당 카드는 숨겨져요.")
+                }
             }
+            .tint(Theme.ink)
             .navigationTitle("설정")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

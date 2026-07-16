@@ -10,8 +10,6 @@ struct CaptureView: View {
     @State private var shots: [Shot] = []
     @State private var flashOpacity = 0.0
     @State private var interstitial: CGImage?
-    @State private var skipRequested = false
-    @State private var elapsedInShot = 0.0
     @State private var guideRect = CGRect.null
     @State private var errorMessage: String?
     @State private var showCancelConfirm = false
@@ -34,56 +32,50 @@ struct CaptureView: View {
 
             statusOverlay
 
-            // 진행 상황 + 컨트롤
-            VStack {
-                HStack(alignment: .top) {
+            // UI 크롬 — Figma 아트보드(834×1194) 좌표 1:1 (노드 5840:22354)
+            ScaledStage {
+                ZStack {
+                    // 뒤로 가기 캡슐 — rect (50, 56, 130, 58), #242424 60%
                     Button {
                         showCancelConfirm = true
                     } label: {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 20, weight: .bold))
+                        Text("뒤로 가기")
+                            .font(.pretendard(20, .semiBold))
+                            .tracking(-0.2)
                             .foregroundStyle(.white)
-                            .padding(14)
-                            .background(.black.opacity(0.35), in: Circle())
+                            .frame(width: 130, height: 58)
+                            .background(Theme.gray800.opacity(0.6), in: Capsule())
                     }
-                    Spacer()
+                    .position(x: 115, y: 85)
+
+                    // 진행 도트 — rect (343, 71, 148, 28), 상단 중앙
                     progressDots
-                    Spacer()
-                    Color.clear.frame(width: 48, height: 48)
-                }
-                .padding(24)
+                        .position(x: 417, y: 85)
 
-                Spacer()
-
-                if countdown > 0 {
-                    Text("\(countdown)")
-                        .font(.system(size: 170, weight: .black, design: .rounded))
-                        .foregroundStyle(.white)
-                        .shadow(color: .black.opacity(0.45), radius: 18, y: 4)
-                        .contentTransition(.numericText(countsDown: true))
-                        .animation(.snappy, value: countdown)
-                }
-
-                Spacer()
-
-                if camera.status == .ready {
-                    VStack(spacing: 12) {
-                        Text("\(min(shotIndex + 1, model.shotCount)) / \(model.shotCount) 컷")
-                            .font(.system(size: 24, weight: .heavy, design: .rounded))
+                    // 대형 카운트다운 — center (417, 587), 180pt
+                    if countdown > 0 {
+                        Text("\(countdown)")
+                            .font(.pretendard(180, .bold))
+                            .tracking(-1.8)
                             .foregroundStyle(.white)
-                        Text("타이머가 끝나면 자동으로 찍혀요 — 5초 동안 영상도 함께 담겨요 🎬")
-                            .font(.system(size: 15, weight: .medium, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.75))
-                        Button("바로 찍기 📸") {
-                            skipRequested = true
-                        }
-                        .buttonStyle(GhostButtonStyle(fontSize: 17))
-                        .tint(.white)
-                        .opacity(countdown > 0 && elapsedInShot >= 2 ? 1 : 0)
+                            .largeShadow()
+                            .contentTransition(.numericText(countsDown: true))
+                            .animation(.snappy, value: countdown)
+                            .position(x: 417, y: 587)
                     }
-                    .padding(.bottom, 28)
+
+                    // 하단 "n/6 컷" 라벨 — center (417, 1079), 32pt
+                    if camera.status == .ready {
+                        Text("\(min(shotIndex + 1, model.shotCount))/\(model.shotCount) 컷")
+                            .font(.pretendard(32, .semiBold))
+                            .tracking(-0.32)
+                            .foregroundStyle(.white)
+                            .largeShadow()
+                            .position(x: 417, y: 1079)
+                    }
                 }
             }
+            .ignoresSafeArea()
 
             // 촬영 플래시
             Color.white
@@ -102,8 +94,9 @@ struct CaptureView: View {
                             .frame(maxWidth: 380, maxHeight: 440)
                             .clipShape(RoundedRectangle(cornerRadius: 18))
                             .shadow(radius: 24)
-                        Text("찰칵! ✨ \(shots.count) / \(model.shotCount)")
-                            .font(.system(size: 22, weight: .heavy, design: .rounded))
+                        Text("찰칵! \(shots.count)/\(model.shotCount) 컷")
+                            .font(.pretendard(32, .semiBold))
+                            .tracking(-0.32)
                             .foregroundStyle(.white)
                     }
                 }
@@ -129,18 +122,22 @@ struct CaptureView: View {
 
     // MARK: - Pieces
 
+    /// 진행 도트 6개 — 완료 컷 라임(r6), 현재 컷 확대 gray-50(r8), 대기 컷 흰색 80%(r6).
+    /// 알약 배경 검정 4% / radius 14. (시안 SVG는 상태가 한 스텝 어긋나 있어 규칙으로 렌더)
     private var progressDots: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 8) {
             ForEach(0..<model.shotCount, id: \.self) { i in
+                let isCurrent = i == shots.count
                 Circle()
-                    .fill(i < shots.count ? Theme.pink : .white.opacity(i == shots.count ? 0.95 : 0.35))
-                    .frame(width: 13, height: 13)
-                    .scaleEffect(i == shots.count ? 1.25 : 1)
+                    .fill(i < shots.count
+                          ? Theme.lime500
+                          : (isCurrent ? Theme.gray50 : .white.opacity(0.8)))
+                    .frame(width: isCurrent ? 16 : 12, height: isCurrent ? 16 : 12)
             }
         }
-        .padding(.horizontal, 18)
-        .padding(.vertical, 12)
-        .background(.black.opacity(0.35), in: Capsule())
+        .frame(height: 28)
+        .padding(.horizontal, 16)
+        .background(.black.opacity(0.04), in: Capsule())
         .animation(.spring(duration: 0.3), value: shots.count)
     }
 
@@ -157,7 +154,7 @@ struct CaptureView: View {
             cameraMessage(
                 icon: "lock.shield",
                 title: "카메라 접근이 꺼져 있어요",
-                message: "설정 앱 → 개인정보 보호 → 카메라에서\nGROWING CUT을 허용해 주세요."
+                message: "설정 앱 → 개인정보 보호 → 카메라에서\ngrowing pots를 허용해 주세요."
             )
         case .failed(let reason):
             cameraMessage(icon: "exclamationmark.triangle", title: "카메라 오류", message: reason)
@@ -176,18 +173,18 @@ struct CaptureView: View {
                 .font(.system(size: 54))
                 .foregroundStyle(.white.opacity(0.9))
             Text(title)
-                .font(.system(size: 28, weight: .heavy, design: .rounded))
+                .font(.pretendard(28, .semiBold))
                 .foregroundStyle(.white)
             Text(message)
-                .font(.system(size: 17, weight: .medium, design: .rounded))
+                .font(.pretendard(17, .regular))
                 .foregroundStyle(.white.opacity(0.75))
                 .multilineTextAlignment(.center)
             Button("처음으로") { model.backToMain() }
-                .buttonStyle(PrimaryButtonStyle(fontSize: 20))
+                .buttonStyle(PrimaryButtonStyle(fontSize: 20, horizontalPadding: 36, verticalPadding: 18))
                 .padding(.top, 8)
         }
         .padding(40)
-        .background(.black.opacity(0.5), in: RoundedRectangle(cornerRadius: 28))
+        .background(Theme.gray900.opacity(0.6), in: RoundedRectangle(cornerRadius: 28))
     }
 
     // MARK: - 촬영 루프
@@ -205,16 +202,10 @@ struct CaptureView: View {
                 let clipURL = model.sessionDir.appendingPathComponent("clip\(i).mov")
                 try await camera.startRecording(to: clipURL)
 
-                // 10초 카운트다운 (0.1초 틱, '바로 찍기' 반영)
-                skipRequested = false
-                elapsedInShot = 0
-                var remaining = Double(model.countdownSeconds)
-                countdown = model.countdownSeconds
-                while remaining > 0 && !skipRequested {
-                    try await Task.sleep(nanoseconds: 100_000_000)
-                    remaining -= 0.1
-                    elapsedInShot += 0.1
-                    countdown = max(1, Int(remaining.rounded(.up)))
+                // 5초 카운트다운 (녹화는 카운트다운 동안 계속 돈다)
+                for remaining in stride(from: model.countdownSeconds, through: 1, by: -1) {
+                    countdown = remaining
+                    try await Task.sleep(nanoseconds: 1_000_000_000)
                 }
                 countdown = 0
 
@@ -242,6 +233,18 @@ struct CaptureView: View {
         } catch {
             errorMessage = error.localizedDescription
         }
+    }
+}
+
+// MARK: - 텍스트 그림자
+
+private extension View {
+    /// Figma Effect "Large" — #131414 8% 2겹: (0,16) blur 24 + (0,6) blur 10.
+    /// SwiftUI radius ≈ blur/2 로 환산, spread(-6/-4)는 SwiftUI 미지원이라 생략.
+    func largeShadow() -> some View {
+        self
+            .shadow(color: Color(hex: 0x131414, opacity: 0.08), radius: 12, y: 16)
+            .shadow(color: Color(hex: 0x131414, opacity: 0.08), radius: 5, y: 6)
     }
 }
 
