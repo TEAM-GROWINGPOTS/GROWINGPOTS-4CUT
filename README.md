@@ -1,21 +1,23 @@
-# GROWING CUT — 아이패드 인생네컷 앱
+# growing pots — 아이패드 인생네컷 앱 (구 GROWING CUT)
 
-아이패드로 찍는 셀프 네컷 부스입니다. (아이폰에서도 실행됩니다 — 가로 모드 전용이며, 카메라 흐름 테스트 용도로 유용해요.)
+아이패드로 찍는 셀프 네컷 부스입니다. 졸업식 컨셉 "growing pots" 디자인(Figma 시안 1:1 재현)이 적용되어 있어요. (아이폰에서도 실행됩니다 — 세로 고정, 카메라 흐름 테스트 용도로 유용해요.)
 
-**흐름:** 메인 화면 → `촬영 시작` → 전면 카메라가 10초 타이머로 8컷을 자동 촬영(각 컷의 10초 동안 영상도 함께 녹화) → 8컷 중 4컷 선택 + 프레임(6종) 선택 → 네컷 이미지 합성(이미지 우측 상단에 QR 포함) → 화면에도 QR 표시 → 휴대폰으로 QR을 찍으면 **4시간짜리 임시 링크**에서 네컷 사진과 '움직이는 네컷' 영상(프레임 속 4개 셀이 각자의 10초 클립을 동시 재생)을 저장할 수 있어요.
+**흐름:** 홈 → `촬영 시작` → 전면 카메라가 5초 타이머로 6컷 자동 촬영(각 컷 동안 영상도 함께 녹화) → 6컷 중 4컷 선택 + 프레임(라임/블랙/화이트) 선택 — **40초 제한, 만료 시 자동 진행** → 네컷 합성(우측 상단 QR 포함) → 업로드 대기 중 Instagram/랜딩 QR 노출 → 완료 화면 QR → 휴대폰으로 QR을 찍으면 **4시간짜리 임시 링크**에서 네컷 사진과 '움직이는 네컷' 영상을 저장할 수 있어요.
 
 ```
 growingcut/
-├── ios/                 # 아이패드 앱 (SwiftUI, iOS 18+, 가로 고정)
+├── ios/                 # 아이패드 앱 (SwiftUI, iOS 17+, 세로 고정)
 │   ├── GrowingCut.xcodeproj
 │   ├── GrowingCut/
 │   │   ├── App/         # 앱 진입점, 화면 흐름 상태
-│   │   ├── Views/       # 메인 / 촬영 / 선택 / 결과 / 설정
+│   │   ├── Views/       # 홈 / 촬영 / 선택 / 결과(생성중·대기·완료) / 설정
 │   │   ├── Camera/      # AVCaptureSession (사진 + 클립 동시 캡처)
 │   │   ├── Rendering/   # 네컷 합성 코어 (iOS/macOS 공용, UIKit 무의존)
-│   │   └── Networking/  # 업로드 클라이언트
+│   │   ├── Networking/  # 업로드 클라이언트
+│   │   └── Resources/   # 프레임 오버레이 PNG · UI 에셋 · Pretendard 폰트
 │   └── Support/Info.plist
 ├── server/              # 4시간 임시 링크 공유 서버 (Node 18+, 무의존)
+├── vercel/              # 프로덕션 공유 서버 (Vercel + Blob)
 └── tools/               # macOS 검증 도구 (합성 결과 확인용)
 ```
 
@@ -95,23 +97,23 @@ xcodebuild -project GrowingCut.xcodeproj -target GrowingCut \
 
 | 항목 | 값 | 위치 |
 |---|---|---|
-| 촬영 컷 수 | 8컷 | `AppModel.shotCount` |
-| 컷당 타이머 | 10초 (2초 후 `바로 찍기` 가능) | `AppModel.countdownSeconds` |
-| 선택 컷 수 | 4컷 | `AppModel.pickCount` |
+| 촬영 컷 수 | 6컷 | `AppModel.shotCount` |
+| 컷당 타이머 | 5초 | `AppModel.countdownSeconds` |
+| 선택 컷 수 | 4컷 (제한 40초, 만료 시 자동 채움) | `AppModel.pickCount` / `selectionSeconds` |
 | 링크 유효 시간 | 4시간 | 서버 `TTL_HOURS` |
-| 이미지 | 1200×3600 JPEG, QR 우측 상단 | `LayoutSpec` |
-| 영상 | 600×1800 30fps H.264, 길이 = 가장 짧은 클립(최대 10초) | `VideoComposer` |
+| 이미지 | 1080×1920 JPEG, QR 우측 상단 (862.84, 63) | `LayoutSpec` |
+| 영상 | 540×960 30fps H.264, 길이 = 가장 짧은 클립 | `VideoComposer` |
 
-프레임은 `FrameStyle.all`(화이트/블랙/필름/핑크/스카이/선셋)에서 추가·수정할 수 있어요. 스틸과 영상 오버레이가 같은 렌더러(`FrameRenderer`)를 쓰므로 한 곳만 고치면 됩니다.
+**프레임 시스템 (오버레이 PNG):** 프레임 디자인은 슬롯 4개(각 480×675.5)와 QR 창이 투명하게 뚫린 1080×1920 PNG(`ios/GrowingCut/Resources/Frames/frame-*.png`)입니다. 렌더러는 사진을 슬롯 아래에 깔고 오버레이를 덮은 뒤 QR을 그립니다. **프레임 추가 = 오버레이 PNG 1장 + 썸네일 + `FrameStyle.all` 1줄.** 스틸과 영상 오버레이가 같은 렌더러(`FrameRenderer`)를 씁니다. 현재 3종: 라임/블랙/화이트 (Figma 시안).
 
 ## 검증 도구 (macOS)
 
 카메라·기기 없이 합성 코어를 검증합니다.
 
 ```bash
-# 합성 스틸(전 스타일) + 움직이는 네컷 생성 + QR 디코드 검증 + 프레임 추출
+# 오버레이 알파 검증 + 합성 스틸(3종) + 움직이는 네컷 + QR 디코드 + 프레임 추출
 xcrun swiftc -parse-as-library -O -o /tmp/preview tools/preview.swift ios/GrowingCut/Rendering/*.swift
-/tmp/preview /tmp/preview-out
+/tmp/preview /tmp/preview-out ios/GrowingCut/Resources/Frames
 
 # 영상 파일 길이/크기/프레임 확인, 이미지 QR 디코드
 xcrun swiftc -parse-as-library -O -o /tmp/probe tools/probe.swift
