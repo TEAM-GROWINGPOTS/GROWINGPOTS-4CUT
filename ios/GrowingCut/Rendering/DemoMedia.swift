@@ -6,15 +6,14 @@ import CoreVideo
 /// 카메라 없는 환경(시뮬레이터, macOS 검증 도구)에서 촬영 결과를 흉내내는 합성 미디어 생성기.
 enum DemoMedia {
 
-    private static let palette: [(bg: RGBA, accent: RGBA)] = [
-        (.hex(0xFF8A80), .hex(0xFFFFFF)),
-        (.hex(0xFFB74D), .hex(0x5D2E00)),
-        (.hex(0xFFF176), .hex(0x6D5A00)),
-        (.hex(0xAED581), .hex(0x22430B)),
-        (.hex(0x4DD0E1), .hex(0x00363D)),
-        (.hex(0x64B5F6), .hex(0x0B3560)),
-        (.hex(0xB39DDB), .hex(0x2E1A57)),
-        (.hex(0xF48FB1), .hex(0x561329)),
+    /// 기본 프로필 느낌의 회색 톤 — 컷 구분용으로 배경 명도만 살짝 다르게
+    private static let grays: [(bg: RGBA, figure: RGBA)] = [
+        (.hex(0xF1F1F1), .hex(0xBDBDBD)),
+        (.hex(0xEBEBEB), .hex(0xB6B6B6)),
+        (.hex(0xE6E6E6), .hex(0xB0B0B0)),
+        (.hex(0xF1F1F1), .hex(0xB6B6B6)),
+        (.hex(0xEBEBEB), .hex(0xB0B0B0)),
+        (.hex(0xE6E6E6), .hex(0xBDBDBD)),
     ]
 
     /// 세로 3:4 데모 사진 (세로 거치 전면 카메라와 유사한 비율)
@@ -30,7 +29,7 @@ enum DemoMedia {
         else { return nil }
         ctx.translateBy(x: 0, y: size.height)
         ctx.scaleBy(x: 1, y: -1)
-        drawScene(index: index, t: 0.4, size: size, in: ctx)
+        drawScene(index: index, t: 0.4, size: size, motion: false, in: ctx)
         return ctx.makeImage()
     }
 
@@ -148,41 +147,57 @@ enum DemoMedia {
             // 장면(sceneSize)을 90° CCW 돌려 저장 → 재생 시 90° CW 회전으로 복원됨
             ctx.concatenate(CGAffineTransform(a: 0, b: -1, c: 1, d: 0, tx: 0, ty: sceneSize.width))
         }
-        drawScene(index: index, t: t, size: sceneSize, in: ctx)
+        drawScene(index: index, t: t, size: sceneSize, motion: true, in: ctx)
         return buffer
     }
 
-    /// top-left 좌표계 전제. 좌상단 삼각형 마커로 상하/좌우 방향을 검증한다.
-    private static func drawScene(index: Int, t: Double, size: CGSize, in ctx: CGContext) {
-        let colors = palette[index % palette.count]
+    /// top-left 좌표계 전제. 기본 프로필(회색 사람 실루엣) 스타일 자리표시.
+    /// motion=true(클립)일 때만 방향 마커·움직임 표시를 그린다 — 합성/회전 검증용.
+    private static func drawScene(index: Int, t: Double, size: CGSize, motion: Bool, in ctx: CGContext) {
+        let colors = grays[index % grays.count]
         ctx.setFillColor(colors.bg.cgColor)
         ctx.fill(CGRect(origin: .zero, size: size))
 
-        // 좌상단 방향 마커
-        ctx.setFillColor(RGBA.white.cgColor)
+        // 사람 실루엣: 머리 원 + 어깨 타원 (하단으로 넘치는 부분은 캔버스가 잘라냄)
+        ctx.setFillColor(colors.figure.cgColor)
+        let headR = size.height * 0.13
+        ctx.fillEllipse(in: CGRect(
+            x: size.width / 2 - headR, y: size.height * 0.40 - headR,
+            width: headR * 2, height: headR * 2
+        ))
+        ctx.fillEllipse(in: CGRect(
+            x: size.width * 0.5 - size.width * 0.34, y: size.height * 0.60,
+            width: size.width * 0.68, height: size.height * 0.55
+        ))
+
+        // 컷 번호 (은은하게)
+        FrameRenderer.drawText(
+            "\(index + 1)",
+            size: size.height * 0.07, bold: true, kern: 0,
+            color: colors.figure.alpha(0.9),
+            in: ctx,
+            centerX: size.width / 2,
+            centerY: size.height * 0.12
+        )
+
+        guard motion else { return }
+
+        // 좌상단 방향 마커 (상하/미러 검증용)
+        ctx.setFillColor(RGBA.hex(0x8F8F8F).cgColor)
         ctx.move(to: .zero)
         ctx.addLine(to: CGPoint(x: size.width * 0.14, y: 0))
         ctx.addLine(to: CGPoint(x: 0, y: size.width * 0.14))
         ctx.closePath()
         ctx.fillPath()
 
-        // 좌→우로 움직이는 원
+        // 좌→우로 움직이는 점 (영상 동작 확인용)
         let cx = size.width * (0.18 + 0.64 * CGFloat(t))
-        let r = size.height * 0.16
-        ctx.setFillColor(colors.accent.alpha(0.85).cgColor)
+        let r = size.height * 0.05
+        ctx.setFillColor(RGBA.hex(0x8F8F8F).alpha(0.9).cgColor)
         ctx.fillEllipse(in: CGRect(x: cx - r, y: size.height * 0.5 - r, width: r * 2, height: r * 2))
 
-        FrameRenderer.drawText(
-            "CUT \(index + 1)",
-            size: size.height * 0.16, bold: true, kern: 4,
-            color: colors.accent,
-            in: ctx,
-            centerX: size.width / 2,
-            centerY: size.height * 0.24
-        )
-
         // 하단 진행 바
-        ctx.setFillColor(RGBA.white.alpha(0.55).cgColor)
+        ctx.setFillColor(RGBA.hex(0x9F9F9F).alpha(0.55).cgColor)
         ctx.fill(CGRect(x: 0, y: size.height - 18, width: size.width * CGFloat(t), height: 18))
     }
 }
