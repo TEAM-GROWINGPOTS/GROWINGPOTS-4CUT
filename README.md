@@ -81,7 +81,7 @@ npx vercel deploy --prod
 ```
 
 - 1회 설정: 대시보드 → Storage → **Blob store 연결** (`BLOB_READ_WRITE_TOKEN` 자동 주입)
-- 환경변수: `GC_UPLOAD_KEY`(업로드 보호 — **설정됨**, 앱 기본 키와 일치), `TTL_HOURS`(기본 4), `CRON_SECRET`, `GP_INSTAGRAM_URL`/`GP_LANDING_URL`(웹 푸터 링크 재정의)
+- 환경변수: `GC_UPLOAD_KEY`(업로드 보호 — **설정됨**, 기기 ⚙️에 같은 키 입력), `TTL_HOURS`(기본 4), `CRON_SECRET`, `GP_INSTAGRAM_URL`/`GP_LANDING_URL`(웹 푸터 링크 재정의)
 - 영상은 서버리스 본문 한도(4.5MB) 안에 들도록 비트레이트 캡 (5초 ≈ 2.2MB)
 - **Hobby 플랜 참고**: Blob 고급 연산을 아끼도록 업로드는 `put` 1회(결정적 경로+덮어쓰기), 페이지 조회는 `head` 2회로 동작 — 월 2K 한도 기준 **~1,000세션**. 한도 초과 시 하드 차단(30일)이므로 행사 전 대시보드 Usage 확인 권장. 크론은 Hobby 제한(1일 1회)에 맞춰 daily
 
@@ -102,7 +102,7 @@ node server/server.js
 ### 2) 앱 실행 (아이패드 / 아이폰)
 
 1. `ios/GrowingCut.xcodeproj`를 Xcode 16+로 열고 팀만 선택해 실행
-2. 서버 주소·업로드 키는 기본값으로 이미 프로덕션에 연결됨 (⚙️에서 변경 가능)
+2. 서버 주소는 기본값으로 프로덕션에 연결됨 — **업로드 키만 ⚙️에서 1회 입력** (운영자에게 문의)
 3. 시뮬레이터에는 카메라가 없으므로 홈의 **데모 촬영** 버튼으로 전체 흐름 확인
 
 <details>

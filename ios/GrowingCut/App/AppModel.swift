@@ -35,8 +35,9 @@ final class AppModel: ObservableObject {
     @Published var demoError: String?
 
     @AppStorage("serverBaseURL") var serverBaseURL: String = "https://4-cut.growingpots.kr"
-    /// 공개 서버(GC_UPLOAD_KEY 설정 시)용 업로드 키 — 비어 있으면 헤더를 보내지 않는다
-    @AppStorage("uploadKey") var uploadKey: String = "GC-UPLOAD-KEY-REDACTED"
+    /// 공개 서버(GC_UPLOAD_KEY 설정 시)용 업로드 키 — 비어 있으면 헤더를 보내지 않는다.
+    /// 공개 저장소이므로 키는 소스에 넣지 않는다 — 기기 ⚙️ 설정에서 1회 입력.
+    @AppStorage("uploadKey") var uploadKey: String = ""
     // 생성 대기 화면 프로모 QR 링크 (설정에서 변경 가능)
     @AppStorage("instagramURL") var instagramURL: String = "https://instagram.com/growingpots.official"
     @AppStorage("landingURL") var landingURL: String = "https://growingpots.kr/landing"
@@ -47,8 +48,6 @@ final class AppModel: ObservableObject {
             ("serverBaseURL", ["https://growingcut.vercel.app"], "https://4-cut.growingpots.kr"),
             ("instagramURL", ["https://instagram.com/growingpots", "https://instagram.com/growinpots.offical", "https://instagram.com/growinpots.official"], "https://instagram.com/growingpots.official"),
             ("landingURL", ["https://growingcut.vercel.app"], "https://growingpots.kr/landing"),
-            // 프로덕션에 GC_UPLOAD_KEY 적용(2026-07-17) — 기존 빈 값은 새 키로 이전
-            ("uploadKey", [""], "GC-UPLOAD-KEY-REDACTED"),
         ]
         for m in migrations {
             if let stored = UserDefaults.standard.string(forKey: m.key), m.old.contains(stored) {
